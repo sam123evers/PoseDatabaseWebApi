@@ -2,21 +2,6 @@
 
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.1-buster-slim AS base
 WORKDIR /app
-EXPOSE 80
-EXPOSE 443
-
-FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build
-WORKDIR /src
-COPY ["PoseDatabaseWebApi/PoseDatabaseWebApi.csproj", "PoseDatabaseWebApi/"]
-RUN dotnet restore "PoseDatabaseWebApi/PoseDatabaseWebApi.csproj"
 COPY . .
-WORKDIR "/src/PoseDatabaseWebApi"
-RUN dotnet build "PoseDatabaseWebApi.csproj" -c Release -o /app/build
 
-FROM build AS publish
-RUN dotnet publish "PoseDatabaseWebApi.csproj" -c Release -o /app/publish
-
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "PoseDatabaseWebApi.dll"]
+CMD ASPNETCORE_URLS=http://*:$PORT dotnet PoseDatabaseWebApi.dll
