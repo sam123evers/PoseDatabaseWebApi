@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 using PoseDatabaseWebApi.Models;
+using PoseDatabaseWebApi.Data;
 
 namespace PoseDatabaseWebApi.Controllers
 {
@@ -13,25 +14,24 @@ namespace PoseDatabaseWebApi.Controllers
     [Route("[controller]")]
     public class PoseController : ControllerBase
     {
-        Pose pose_hs = new Pose()
-        {
-            PoseName = "Hand Stand"
-        };
+        private PoseDataContext _context;
 
-        private readonly ILogger<PoseController> _logger;
+        //private readonly ILogger<PoseController> _logger;
 
         public PoseController
         (
+            PoseDataContext context
             //ILogger<PoseController> logger
         )
         {
+            _context = context;
             //_logger = logger;
         }
 
         [HttpGet]
-        public Pose Get()
+        public ActionResult<IEnumerable<Pose>> GetAllPoses()
         {
-            return pose_hs;
+            return Ok(_context.Poses.ToList());
         }
     }
 }

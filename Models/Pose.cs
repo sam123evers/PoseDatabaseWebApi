@@ -7,6 +7,7 @@ namespace PoseDatabaseWebApi.Models
 {
     public class Pose
     {
+        public int Id { get; set; }
         public string PoseName { get; set; }
 
     }
