@@ -13,7 +13,9 @@ namespace PoseDatabaseWebApi.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    PoseName = table.Column<string>(type: "text", nullable: true)
+                    PoseName = table.Column<string>(type: "text", nullable: true),
+                    PoseOriginName = table.Column<string>(type: "text", nullable: true),
+                    PoseOriginStyle = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {

@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace PoseDatabaseWebApi.Models
 {
@@ -10,5 +8,13 @@ namespace PoseDatabaseWebApi.Models
         public int Id { get; set; }
         public string PoseName { get; set; }
 
+        public string PoseOriginName { get; set; }
+
+        public string PoseOriginStyle { get; set; }
+
+        public static implicit operator Pose(ActionResult<Pose> v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

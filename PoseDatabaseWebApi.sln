@@ -5,8 +5,6 @@ VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PoseDatabaseWebApi", "PoseDatabaseWebApi.csproj", "{DD150BC1-3900-4B2C-99BF-A5660C74F1DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XUnitPoseDatabaseTests", "..\XUnitPoseDatabaseTests\XUnitPoseDatabaseTests.csproj", "{E1859D25-0316-474E-8630-DF208EADDF11}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,10 +15,6 @@ Global
 		{DD150BC1-3900-4B2C-99BF-A5660C74F1DC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD150BC1-3900-4B2C-99BF-A5660C74F1DC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD150BC1-3900-4B2C-99BF-A5660C74F1DC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E1859D25-0316-474E-8630-DF208EADDF11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E1859D25-0316-474E-8630-DF208EADDF11}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E1859D25-0316-474E-8630-DF208EADDF11}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E1859D25-0316-474E-8630-DF208EADDF11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
