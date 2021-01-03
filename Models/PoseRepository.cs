@@ -85,5 +85,18 @@ namespace PoseDatabaseWebApi.Models
         {
             return _context.Poses.Any(e => e.Id == id);
         }
+
+        public async Task<IEnumerable<Pose>> Search(string input)
+        {
+            IEnumerable<Pose> result = _context.Poses;
+
+            if (!string.IsNullOrEmpty(input))
+            {
+                result = result.Where(e => e.PoseName.Contains(input)
+                    || e.PoseOriginName.Contains(input));
+            }
+
+            return result;
+        }
     }
 }

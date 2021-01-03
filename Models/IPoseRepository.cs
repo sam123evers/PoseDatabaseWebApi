@@ -5,6 +5,7 @@ namespace PoseDatabaseWebApi.Models
 {
     public interface IPoseRepository
     {
+        Task<IEnumerable<Pose>> Search(string input);
         Task<Pose> GetPose(int id);
         Task<IEnumerable<Pose>> GetPoses();
         Task<Pose> UpdatePoseDetails(int id, Pose pose);

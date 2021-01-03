@@ -29,6 +29,24 @@ namespace PoseDatabaseWebApi.Controllers
             return Ok(result);
         }
 
+        [HttpGet("search/{input}")]
+        public async Task<ActionResult<IEnumerable<Pose>>> Search(string input)
+        {
+            try
+            {
+                var result = await _poseRepository.Search(input);
+                if (result.Any())
+                {
+                    return Ok(result);
+                }
+                return NotFound();
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+        }
+
         // GET: api/Poses/5
         [HttpGet("{id}")]
         public async Task<ActionResult> GetPose(int id)
