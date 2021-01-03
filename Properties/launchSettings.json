@@ -17,6 +17,14 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
+    "Production": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "api/poses",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      }
+    },
     "PoseDatabaseWebApi": {
       "commandName": "Project",
       "launchBrowser": true,
@@ -29,7 +37,7 @@
     "Docker": {
       "commandName": "Docker",
       "launchBrowser": true,
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/weatherforecast",
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/api/poses",
       "publishAllPorts": true,
       "useSSL": true
     }
