@@ -62,22 +62,8 @@ namespace PoseDatabaseWebApi.Controllers
             }
         }
 
-        //[HttpGet("search/{searchTerm}")]
-        //public async Task<ActionResult<IEnumerable<Pose>>> GetPosesWithSearchTerm(string searchTerm)
-        //{
-        //    IEnumerable<Pose> posesMatchingTerm = _context.Poses.Where(x => x.PoseName.Contains(searchTerm));
-
-        //    if (posesMatchingTerm == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return Ok(posesMatchingTerm);
-        //}
-
         // PUT: api/Poses/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-
 
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdatePoseDetails(int id, Pose pose)

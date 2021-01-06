@@ -10,6 +10,8 @@ namespace PoseDatabaseWebApi
 {
     public class Startup
     {
+        readonly string PoseDatabaseClientOrigin = "_poseDatabaseClientOrigin";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -20,6 +22,14 @@ namespace PoseDatabaseWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: PoseDatabaseClientOrigin,
+                                  builder =>
+                                  {
+                                      builder.WithOrigins("http://localhost:4200");
+                                  });
+            });
             services.AddScoped<IPoseRepository, PoseRepository>();
             services.AddDbContext<PoseContext>(opt => opt.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
             services.AddControllers();
@@ -36,6 +46,8 @@ namespace PoseDatabaseWebApi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors(PoseDatabaseClientOrigin);
 
             app.UseAuthorization();
 
