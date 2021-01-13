@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PoseDatabaseWebApi.Models;
+using Npgsql;
 
 namespace PoseDatabaseWebApi
 {
@@ -22,6 +23,11 @@ namespace PoseDatabaseWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var builder = new NpgsqlConnectionStringBuilder();
+            builder.ConnectionString = Configuration.GetConnectionString("DefaultConnection");
+            builder.Username = Configuration["UserId"];
+            builder.Password = Configuration["Password"];
+
             services.AddCors(options =>
             {
                 options.AddPolicy(name: PoseDatabaseClientOrigin,
@@ -31,7 +37,7 @@ namespace PoseDatabaseWebApi
                                   });
             });
             services.AddScoped<IPoseRepository, PoseRepository>();
-            services.AddDbContext<PoseContext>(opt => opt.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<PoseContext>(opt => opt.UseNpgsql(builder.ConnectionString));
             services.AddControllers();
         }
 
