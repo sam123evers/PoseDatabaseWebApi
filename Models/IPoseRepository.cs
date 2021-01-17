@@ -5,11 +5,13 @@ namespace PoseDatabaseWebApi.Models
 {
     public interface IPoseRepository
     {
-        Task<IEnumerable<Pose>> Search(string input);
-        Task<Pose> GetPose(int id);
-        Task<IEnumerable<Pose>> GetPoses();
-        Task<Pose> UpdatePoseDetails(int id, Pose pose);
-        Task<Pose> AddPoseToDb(Pose pose);
-        Task<Pose> DeletePose(int id);
+        bool SaveChanges();
+        IEnumerable<Pose> Search(string input);
+        Pose GetPose(int id);
+        IEnumerable<Pose> GetPoses();
+        Pose UpdatePoseDetails(int id, Pose pose);
+        void PatchPoseDetails(Pose pose);
+        void AddPoseToDb(Pose pose);
+        void DeletePose(Pose pose);
     }
 }

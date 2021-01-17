@@ -15,15 +15,20 @@ namespace PoseDatabaseWebApi.Models
             _context = context;
         }
 
-        public async Task<IEnumerable<Pose>> GetPoses()
+        public bool SaveChanges()
         {
-            IEnumerable<Pose> result = await _context.Poses.ToListAsync();
+            return (_context.SaveChanges() >= 0);
+        }
+
+        public IEnumerable<Pose> GetPoses()
+        {
+            IEnumerable<Pose> result = _context.Poses.ToList();
             return result;
         }
 
-        public async Task<Pose> GetPose(int id)
+        public Pose GetPose(int id)
         {
-            Pose pose = await _context.Poses.FindAsync(id);
+            var pose =  _context.Poses.FirstOrDefault(p => p.Id == id);
             if (pose == null)
             {
                 throw new ArgumentException(
@@ -35,27 +40,27 @@ namespace PoseDatabaseWebApi.Models
             }
         }
 
-
-        public async Task<Pose> AddPoseToDb(Pose pose)
+        public void AddPoseToDb(Pose pose)
         {
-            _context.Poses.Add(pose);
-            await _context.SaveChangesAsync();
-            var result = await _context.Poses.FindAsync(pose.Id);
+            if (pose == null)
+            {
+                throw new ArgumentNullException(nameof(pose));
+            }
 
-            return result;
+            _context.Poses.Add(pose);
         }
 
-        public async Task<Pose> DeletePose(int id)
+        public void DeletePose(Pose pose)
         {
-            Pose pose = await _context.Poses.FindAsync(id);
+            if (pose == null)
+            {
+                throw new ArgumentNullException(nameof(pose));
+            }
 
             _context.Poses.Remove(pose);
-            await _context.SaveChangesAsync();
-
-            return pose;
         }
 
-        public async Task<Pose> UpdatePoseDetails(int id, Pose pose)
+        public Pose UpdatePoseDetails(int id, Pose pose)
         {
             var poseFromDb = new Pose();
             try
@@ -67,7 +72,7 @@ namespace PoseDatabaseWebApi.Models
                     poseFromDb.PoseOriginStyle = pose.PoseOriginStyle;
                     poseFromDb.PoseName = pose.PoseName;
                     poseFromDb.PoseOriginName = pose.PoseOriginName;
-                    await _context.SaveChangesAsync();
+                    _context.SaveChanges();
                 }
 
             }
@@ -81,12 +86,18 @@ namespace PoseDatabaseWebApi.Models
             return poseFromDb;
         }
 
+        public void PatchPoseDetails(Pose pose)
+        { 
+            // Here...
+            // We do nothing...s
+        }
+
         private bool PoseExists(int id)
         {
             return _context.Poses.Any(e => e.Id == id);
         }
 
-        public async Task<IEnumerable<Pose>> Search(string input)
+        public IEnumerable<Pose> Search(string input)
         {
             IEnumerable<Pose> result = _context.Poses;
 

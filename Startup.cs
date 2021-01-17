@@ -6,6 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PoseDatabaseWebApi.Models;
 using Npgsql;
+using AutoMapper;
+using System;
+using Newtonsoft.Json.Serialization;
 
 namespace PoseDatabaseWebApi
 {
@@ -38,7 +41,10 @@ namespace PoseDatabaseWebApi
             });
             services.AddScoped<IPoseRepository, PoseRepository>();
             services.AddDbContext<PoseContext>(opt => opt.UseNpgsql(builder.ConnectionString));
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(s => {
+                s.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+            });
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

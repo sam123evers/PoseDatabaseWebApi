@@ -8,6 +8,10 @@ using Microsoft.EntityFrameworkCore;
 using PoseDatabaseWebApi.Models;
 using PoseDatabaseWebApi.CustomActionResults;
 
+using AutoMapper;
+using PoseDatabaseWebApi.Dtos;
+using Microsoft.AspNetCore.JsonPatch;
+
 namespace PoseDatabaseWebApi.Controllers
 {
     [Route("api/[controller]")]
@@ -15,26 +19,40 @@ namespace PoseDatabaseWebApi.Controllers
     public class PosesController : ControllerBase
     {
         private readonly IPoseRepository _poseRepository;
+        private readonly IMapper _mapper;
 
-        public PosesController(IPoseRepository poseRepository)
+        public PosesController(IPoseRepository poseRepository, IMapper mapper)
         {
             _poseRepository = poseRepository;
+            _mapper = mapper;
         }
 
         // GET: api/Poses
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pose>>> GetPoses()
+        public ActionResult<IEnumerable<PoseReadDto>> GetPoses()
         {
-            var result = await _poseRepository.GetPoses();
-            return Ok(result);
+            var result = _poseRepository.GetPoses();
+            return Ok(_mapper.Map<IEnumerable<PoseReadDto>>(result));
+        }
+
+        // GET: api/Poses/5
+        [HttpGet("{id}", Name = "GetPose")]
+        public ActionResult<PoseReadDto> GetPose(int id)
+        {
+            var pose = _poseRepository.GetPose(id);
+            if (pose == null)
+            {
+                return NotFound();
+            }
+            return Ok(_mapper.Map<PoseReadDto>(pose));
         }
 
         [HttpGet("search/{input}")]
-        public async Task<ActionResult<IEnumerable<Pose>>> Search(string input)
+        public ActionResult<IEnumerable<Pose>> Search(string input)
         {
             try
             {
-                var result = await _poseRepository.Search(input);
+                var result = _poseRepository.Search(input);
                 if (result.Any())
                 {
                     return Ok(result);
@@ -47,62 +65,85 @@ namespace PoseDatabaseWebApi.Controllers
             }
         }
 
-        // GET: api/Poses/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult> GetPose(int id)
-        {
-            try
-            {
-                var result = await _poseRepository.GetPose(id);
-                return Ok(result);
-            }
-            catch (Exception e)
-            {
-                return new ActionResultException(e);
-            }
-        }
-
         // PUT: api/Poses/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePoseDetails(int id, Pose pose)
+        [HttpPatch("{id}")]
+        public ActionResult PartialPoseUpdate(int id, JsonPatchDocument<PoseUpdateDto> patchDoc)
         {
-            try
+            var poseModelFromRepo = _poseRepository.GetPose(id);
+            if (poseModelFromRepo == null)
             {
-                var updatedPose = await _poseRepository.UpdatePoseDetails(id, pose);
-                return Ok(updatedPose);
+                return NotFound();
             }
-            catch (Exception e)
+
+            var poseToPatch = _mapper.Map<PoseUpdateDto>(poseModelFromRepo);
+            patchDoc.ApplyTo(poseToPatch, ModelState);
+
+            if (!TryValidateModel(poseToPatch))
             {
-                return BadRequest(e.Message);
+                return ValidationProblem(ModelState);
             }
+
+            _mapper.Map(poseToPatch, poseModelFromRepo);
+
+            _poseRepository.PatchPoseDetails(poseModelFromRepo);
+
+            _poseRepository.SaveChanges();
+
+            return NoContent();
         }
 
         //POST: api/Poses
         //To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Pose>> AddPoseToDb(Pose pose)
+        public ActionResult<PoseReadDto> AddPoseToDb(PoseCreateDto poseCreate)
         {
-            var poseNoId = new Pose()
+            var poseModel = _mapper.Map<Pose>(poseCreate);
+
+
+            _poseRepository.AddPoseToDb(poseModel);
+
+
+            _poseRepository.SaveChanges();
+
+            var poseReadDto = _mapper.Map<PoseReadDto>(poseModel);
+
+            return CreatedAtRoute(nameof(GetPose), new { Id = poseReadDto.Id }, poseReadDto);
+            //CreatedAtRoute(RouteWhereResourceResides, Id of resource(used to generate route, actualReponseContent)
+        }
+
+        [HttpPut("{id}")]
+        public ActionResult UpdatePose(int id, PoseUpdateDto poseUpdateDto)
+        {
+            var poseModelFromRepo = _poseRepository.GetPose(id);
+            if (poseModelFromRepo == null)
             {
-                PoseName = pose.PoseName,
-                PoseOriginName = pose.PoseOriginName,
-                PoseOriginStyle = pose.PoseOriginStyle
-            };
+                return NotFound();
+            }
 
-            var result = await _poseRepository.AddPoseToDb(poseNoId);
+            _mapper.Map(poseUpdateDto, poseModelFromRepo);
 
-            return Ok(result);
+            _poseRepository.PatchPoseDetails(poseModelFromRepo);
+            _poseRepository.SaveChanges();
+
+            return NoContent();
         }
 
         // DELETE: api/Poses/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletePose(int id)
+        public ActionResult DeletePose(int id)
         {
-            Pose deletedPose = await _poseRepository.DeletePose(id);
+            var poseModelFromRepo = _poseRepository.GetPose(id);
+            if (poseModelFromRepo == null)
+            {
+                return NotFound();
+            }
 
-            return Ok(deletedPose);
+            _poseRepository.DeletePose(poseModelFromRepo);
+            _poseRepository.SaveChanges();
+
+            return NoContent();
         }
     }
 }
