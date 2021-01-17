@@ -17,9 +17,9 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Production": {
+    "Release": {
       "commandName": "Project",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "launchUrl": "api/poses",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Production"
