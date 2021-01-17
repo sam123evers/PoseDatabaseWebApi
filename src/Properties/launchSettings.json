@@ -17,12 +17,12 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Production": {
+    "Release": {
       "commandName": "Project",
       "launchBrowser": false,
       "launchUrl": "api/poses",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Production"
+        "ASPNETCORE_ENVIRONMENT": "Release"
       }
     },
     "PoseDatabaseWebApi": {
