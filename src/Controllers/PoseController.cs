@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using PoseDatabaseWebApi.Models;
-using PoseDatabaseWebApi.CustomActionResults;
 
 using AutoMapper;
 using PoseDatabaseWebApi.Dtos;
@@ -18,10 +15,6 @@ namespace PoseDatabaseWebApi.Controllers
     [ApiController]
     public class PosesController : ControllerBase
     {
-
-        // Random Change
-
-
         private readonly IPoseRepository _poseRepository;
         private readonly IMapper _mapper;
 
