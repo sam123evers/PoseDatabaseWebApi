@@ -49,8 +49,7 @@ namespace PoseDatabaseWebApiXUnitTests
             var result = controller.GetPoses();
 
             // Assert
-            //Assert.IsType<OkObjectResult>(result.Result);
-            Assert.IsType<NotFoundResult>(result.Result);
+            Assert.IsType<OkObjectResult>(result.Result);
 
         }
 
