@@ -22,7 +22,7 @@
       "launchBrowser": false,
       "launchUrl": "api/poses",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Release"
+        "ASPNETCORE_ENVIRONMENT": "Production"
       }
     },
     "PoseDatabaseWebApi": {
