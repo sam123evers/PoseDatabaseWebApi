@@ -26,6 +26,9 @@ namespace PoseDatabaseWebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(Configuration.GetValue<string>("Value"));
+            Console.ForegroundColor = ConsoleColor.White;
             var builder = new NpgsqlConnectionStringBuilder();
             builder.ConnectionString = Configuration.GetConnectionString("DefaultConnection");
             builder.Username = Configuration["UserId"];
