@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -9,6 +10,8 @@ using Npgsql;
 using AutoMapper;
 using System;
 using Newtonsoft.Json.Serialization;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace PoseDatabaseWebApi
 {
@@ -44,16 +47,27 @@ namespace PoseDatabaseWebApi
             });
             services.AddScoped<IPoseRepository, PoseRepository>();
             services.AddDbContext<PoseContext>(opt => opt.UseNpgsql(builder.ConnectionString));
-            services.AddControllers().AddNewtonsoftJson(s => {
+
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt=>
+            {                    
+                opt.Audience = Configuration["ResourceId"];
+                opt.Authority = $"{Configuration["Instance"]}{Configuration["TenantId"]}";
+                opt.RequireHttpsMetadata = true;
+            });
+            
+            services.AddControllers().AddNewtonsoftJson(s =>
+            {
                 s.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             });
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, PoseContext context)
         {
-            context.Database.Migrate();
+            //context.Database.Migrate();
 
             if (env.IsDevelopment())
             {
@@ -64,9 +78,11 @@ namespace PoseDatabaseWebApi
 
             app.UseRouting();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseCors(PoseDatabaseClientOrigin);
 
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

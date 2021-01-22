@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Authorization;
 using PoseDatabaseWebApi.Models;
 
 using AutoMapper;
 using PoseDatabaseWebApi.Dtos;
-using Microsoft.AspNetCore.JsonPatch;
+
 
 namespace PoseDatabaseWebApi.Controllers
 {
@@ -25,6 +27,7 @@ namespace PoseDatabaseWebApi.Controllers
         }
 
         // GET: api/Poses
+        [Authorize]
         [HttpGet]
         public ActionResult<IEnumerable<PoseReadDto>> GetPoses()
         {
@@ -34,6 +37,7 @@ namespace PoseDatabaseWebApi.Controllers
 
         // GET: api/Poses/5
         [HttpGet("{id}", Name = "GetPose")]
+        [Authorize]
         public ActionResult<PoseReadDto> GetPose(int id)
         {
             var pose = _poseRepository.GetPose(id);
