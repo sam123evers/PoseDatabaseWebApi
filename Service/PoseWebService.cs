@@ -27,7 +27,9 @@ namespace PoseDatabaseWebApi.Service;
                      UserDataId = user.UserDataId ?? -1,
                      FirstName = user.FirstName,
                      LastName = user.LastName,
-                     Email = user.Email
+                     Email = user.Email,
+                     UserName = user.UserName,
+                     IsDeleted = user.IsDeleted
                  }
             );
         }
@@ -48,5 +50,22 @@ namespace PoseDatabaseWebApi.Service;
         return await _poseWebData.CreateUserAsync(tansformedModel);
     }
 
+    public async Task<int> UpdateUser(UpdateUserDataModel userUpdateObj)
+    {
+        UpdateUserDto tansformedModel = new()
+        {
+            UserDataId = userUpdateObj.UserDataId,
+            FirstName = userUpdateObj.FirstName,
+            LastName = userUpdateObj.LastName,
+            Email = userUpdateObj.Email,
+            UserName = userUpdateObj.UserName,
+        };
+        return await _poseWebData.UpdateUserAsync(tansformedModel);
+    }
+
+    public async Task<int> SetDeleteUser(int userDataId)
+    {
+        return await _poseWebData.SetDeleteUserAsync(userDataId);
+    }
 }
 

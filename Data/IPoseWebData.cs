@@ -7,5 +7,9 @@ namespace PoseDatabaseWebApi.Data
         Task<List<UserDto>> GetUsersAsync();
 
         Task<int> CreateUserAsync(UserDto userCreateObj);
+
+        Task<int> UpdateUserAsync(UpdateUserDto userUpdateObj);
+
+        Task<int> SetDeleteUserAsync(int userDataId);
     }
 }

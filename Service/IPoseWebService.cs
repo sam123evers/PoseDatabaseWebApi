@@ -7,5 +7,9 @@ namespace PoseDatabaseWebApi.Service
        Task<List<UserDataModel>> GetUserData();
 
         Task<int> CreateUser(UserDataModel userCreateObj);
+
+        Task<int> UpdateUser(UpdateUserDataModel userUpdateeObj);
+
+        Task<int> SetDeleteUser(int userDataId);
     }
 }
