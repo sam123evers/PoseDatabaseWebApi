@@ -1,4 +1,5 @@
 ﻿using PoseDatabaseWebApi.Data;
+using PoseDatabaseWebApi.Data.Dto;
 using PoseDatabaseWebApi.Models;
 
 namespace PoseDatabaseWebApi.Service;
@@ -23,7 +24,7 @@ namespace PoseDatabaseWebApi.Service;
             userModelList.Add(
                  new UserDataModel()
                  {
-                     UserDataId = user.UserDataId,
+                     UserDataId = user.UserDataId ?? -1,
                      FirstName = user.FirstName,
                      LastName = user.LastName,
                      Email = user.Email
@@ -32,6 +33,19 @@ namespace PoseDatabaseWebApi.Service;
         }
 
         return userModelList;
+    }
+
+    public async Task<int> CreateUser(UserDataModel userCreateObj)
+    {
+        UserDto tansformedModel = new()
+        {
+            FirstName = userCreateObj.FirstName,
+            LastName = userCreateObj.LastName,
+            Email = userCreateObj.Email,
+            UserName = userCreateObj.UserName,
+            IsDeleted = false
+        };
+        return await _poseWebData.CreateUserAsync(tansformedModel);
     }
 
 }

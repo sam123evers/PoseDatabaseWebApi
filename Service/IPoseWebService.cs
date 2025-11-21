@@ -5,5 +5,7 @@ namespace PoseDatabaseWebApi.Service
     public interface IPoseWebService
     {
        Task<List<UserDataModel>> GetUserData();
+
+        Task<int> CreateUser(UserDataModel userCreateObj);
     }
 }

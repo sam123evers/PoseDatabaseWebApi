@@ -15,9 +15,16 @@ namespace PoseDatabaseWebApi.Controllers
             _poseWebService = service;
         }
 
+        [Route("GetUsers")]
         public async Task<List<UserDataModel>> GetUsersAsync()
         {
             return await _poseWebService.GetUserData();
+        }
+
+        [Route("CreateUser")]
+        public async Task<int> CreateUserAsync([FromBody]UserDataModel createUserInput)
+        {
+            return await _poseWebService.CreateUser(createUserInput);
         }
 
     }
