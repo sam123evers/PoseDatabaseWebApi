@@ -2,6 +2,7 @@ using Microsoft.Win32;
 using Npgsql;
 using PoseDatabaseWebApi;
 using PoseDatabaseWebApi.Data;
+using PoseDatabaseWebApi.Profiles;
 using PoseDatabaseWebApi.Service;
 
 string connectionString = ConfigurationHelper.GetConnectionString("PoseDatabase");
@@ -21,6 +22,9 @@ builder.Services.AddSingleton(_ => NpgsqlDataSource.Create(connectionString));
 // Register data + service layers
 builder.Services.AddScoped<IPoseWebData, PoseWebData>();
 builder.Services.AddScoped<IPoseWebService, PoseWebService>();
+
+// is this the best way to inject automapper?
+builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

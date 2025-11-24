@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PoseDatabaseWebApi.Service;
 using PoseDatabaseWebApi.Models;
-using System.Xml.Serialization;
 
 namespace PoseDatabaseWebApi.Controllers
 {
@@ -42,6 +41,5 @@ namespace PoseDatabaseWebApi.Controllers
         {
             return await _poseWebService.SetDeleteUser(userDataId);
         }
-
     }
 }

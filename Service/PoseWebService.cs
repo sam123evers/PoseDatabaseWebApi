@@ -1,71 +1,124 @@
-﻿using PoseDatabaseWebApi.Data;
+﻿using AutoMapper;
+using PoseDatabaseWebApi.Data;
 using PoseDatabaseWebApi.Data.Dto;
 using PoseDatabaseWebApi.Models;
+using System;
 
 namespace PoseDatabaseWebApi.Service;
 
     public class PoseWebService : IPoseWebService
     {
         private readonly IPoseWebData _poseWebData;
-        public PoseWebService(IPoseWebData poseWebData) 
-        { 
-            _poseWebData = poseWebData;
-        }
+        private readonly IMapper _mapper;
+    public PoseWebService(IPoseWebData poseWebData, IMapper mapper) 
+    { 
+        _poseWebData = poseWebData;
+        _mapper = mapper;
+    }
+
+    #region User Methods
+    //public async Task<List<UserDataModel>> GetUserData()
+    //{
+    //    var users = await _poseWebData.GetUsersAsync();
+
+    //    List<UserDataModel> userModelList = new();
+
+    //    foreach (var user in users)
+    //    {
+    //        userModelList.Add(
+    //             new UserDataModel()
+    //             {
+    //                 UserDataId = user.UserDataId ?? -1,
+    //                 FirstName = user.FirstName,
+    //                 LastName = user.LastName,
+    //                 Email = user.Email,
+    //                 UserName = user.UserName,
+    //                 IsDeleted = user.IsDeleted
+    //             }
+    //        );
+    //    }
+
+    //    return userModelList;
+    //}
 
     public async Task<List<UserDataModel>> GetUserData()
     {
         var users = await _poseWebData.GetUsersAsync();
 
-        List<UserDataModel> userModelList = new();
-
-        foreach (var user in users)
-        {
-
-            userModelList.Add(
-                 new UserDataModel()
-                 {
-                     UserDataId = user.UserDataId ?? -1,
-                     FirstName = user.FirstName,
-                     LastName = user.LastName,
-                     Email = user.Email,
-                     UserName = user.UserName,
-                     IsDeleted = user.IsDeleted
-                 }
-            );
-        }
-
-        return userModelList;
+        // one-line? nah...
+        return _mapper.Map<List<UserDataModel>>(users);
     }
 
     public async Task<int> CreateUser(UserDataModel userCreateObj)
     {
-        UserDto tansformedModel = new()
-        {
-            FirstName = userCreateObj.FirstName,
-            LastName = userCreateObj.LastName,
-            Email = userCreateObj.Email,
-            UserName = userCreateObj.UserName,
-            IsDeleted = false
-        };
-        return await _poseWebData.CreateUserAsync(tansformedModel);
+        return await _poseWebData.CreateUserAsync(_mapper.Map<UserDto>(userCreateObj));
     }
 
     public async Task<int> UpdateUser(UpdateUserDataModel userUpdateObj)
     {
-        UpdateUserDto tansformedModel = new()
-        {
-            UserDataId = userUpdateObj.UserDataId,
-            FirstName = userUpdateObj.FirstName,
-            LastName = userUpdateObj.LastName,
-            Email = userUpdateObj.Email,
-            UserName = userUpdateObj.UserName,
-        };
-        return await _poseWebData.UpdateUserAsync(tansformedModel);
+        return await _poseWebData.UpdateUserAsync(_mapper.Map<UpdateUserDto>(userUpdateObj));
     }
 
     public async Task<int> SetDeleteUser(int userDataId)
     {
         return await _poseWebData.SetDeleteUserAsync(userDataId);
     }
+
+    #endregion
+
+    #region Pose Methods
+
+    public async Task<List<PoseModel>> GetPoseList()
+    {
+        var poses = await _poseWebData.SelectPoseListAsync();
+
+        //List<PoseModel> poseModelList = new();
+
+        //foreach (var pose in poses)
+        //{
+        //    poseModelList.Add(
+        //         new PoseModel()
+        //         {
+        //             PoseId = pose.PoseId ?? -1,
+        //             PoseName = pose.PoseName,
+        //             PhotoUrl = pose.PhotoUrl,
+        //             PoseVariations = pose.PoseVariations
+        //         }
+        //    );
+        //}
+
+        return _mapper.Map<List<PoseModel>>(poses);
+    }
+
+    public async Task<int> CreatePose(PoseModel poseCreateObj)
+    {
+        //PoseDto tansformedModel = new()
+        //{
+        //    PoseName = poseCreateObj.PoseName,
+        //    PhotoUrl = poseCreateObj.PhotoUrl,
+        //    PoseVariations = poseCreateObj.PoseVariations
+        //};
+
+        return await _poseWebData.InsertPoseAsync(_mapper.Map<PoseDto>(poseCreateObj));
+    }
+
+    public async Task<int> UpdatePose(UpdatePoseModel poseUpdateObj)
+    {
+        //UpdatePoseDto tansformedModel = new()
+        //{
+        //    PoseId = poseUpdateObj.PoseId,
+        //    PoseName = poseUpdateObj.PoseName,
+        //    PhotoUrl = poseUpdateObj.PhotoUrl,
+        //    PoseVariations = poseUpdateObj.PoseVariations
+        //};
+        return await _poseWebData.UpdatePoseAsync(_mapper.Map<UpdatePoseDto>(poseUpdateObj));
+    }
+
+    public async Task<int> SetDeletePose(int poseId)
+    {
+        return await _poseWebData.SetDeletePoseAsync(poseId);
+    }
+
+    #endregion
 }
 
