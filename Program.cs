@@ -1,15 +1,11 @@
-using Microsoft.Win32;
 using Npgsql;
 using PoseDatabaseWebApi;
 using PoseDatabaseWebApi.Data;
-using PoseDatabaseWebApi.Profiles;
 using PoseDatabaseWebApi.Service;
 
 string connectionString = ConfigurationHelper.GetConnectionString("PoseDatabase");
 
 await using var conn = new NpgsqlConnection(connectionString);
-//await conn.OpenAsync();
-//Console.WriteLine($"The PostgreSQL version: {conn.PostgreSqlVersion}");
 
 await using var dataSource = NpgsqlDataSource.Create(connectionString);
 
@@ -23,7 +19,7 @@ builder.Services.AddSingleton(_ => NpgsqlDataSource.Create(connectionString));
 builder.Services.AddScoped<IPoseWebData, PoseWebData>();
 builder.Services.AddScoped<IPoseWebService, PoseWebService>();
 
-// is this the best way to inject automapper?
+// inject automapper
 builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddControllers();

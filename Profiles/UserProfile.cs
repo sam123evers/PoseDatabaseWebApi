@@ -8,7 +8,6 @@ namespace PoseDatabaseWebApi.Profiles
     {
         public UserProfile()
         {
-            // Create mapping between UserDto and UserDataModel
             CreateMap<UserDto, UserDataModel>().ReverseMap();
             CreateMap<UpdateUserDto, UpdateUserDataModel>().ReverseMap();
         }

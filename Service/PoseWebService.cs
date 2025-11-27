@@ -17,34 +17,9 @@ namespace PoseDatabaseWebApi.Service;
     }
 
     #region User Methods
-    //public async Task<List<UserDataModel>> GetUserData()
-    //{
-    //    var users = await _poseWebData.GetUsersAsync();
-
-    //    List<UserDataModel> userModelList = new();
-
-    //    foreach (var user in users)
-    //    {
-    //        userModelList.Add(
-    //             new UserDataModel()
-    //             {
-    //                 UserDataId = user.UserDataId ?? -1,
-    //                 FirstName = user.FirstName,
-    //                 LastName = user.LastName,
-    //                 Email = user.Email,
-    //                 UserName = user.UserName,
-    //                 IsDeleted = user.IsDeleted
-    //             }
-    //        );
-    //    }
-
-    //    return userModelList;
-    //}
-
     public async Task<List<UserDataModel>> GetUserData()
     {
-        var users = await _poseWebData.GetUsersAsync();
-
+        List<UserDto> users = await _poseWebData.GetUsersAsync();
         // one-line? nah...
         return _mapper.Map<List<UserDataModel>>(users);
     }
@@ -70,47 +45,18 @@ namespace PoseDatabaseWebApi.Service;
 
     public async Task<List<PoseModel>> GetPoseList()
     {
-        var poses = await _poseWebData.SelectPoseListAsync();
-
-        //List<PoseModel> poseModelList = new();
-
-        //foreach (var pose in poses)
-        //{
-        //    poseModelList.Add(
-        //         new PoseModel()
-        //         {
-        //             PoseId = pose.PoseId ?? -1,
-        //             PoseName = pose.PoseName,
-        //             PhotoUrl = pose.PhotoUrl,
-        //             PoseVariations = pose.PoseVariations
-        //         }
-        //    );
-        //}
+        List<PoseDto> poses = await _poseWebData.SelectPoseListAsync();
 
         return _mapper.Map<List<PoseModel>>(poses);
     }
 
     public async Task<int> CreatePose(PoseModel poseCreateObj)
     {
-        //PoseDto tansformedModel = new()
-        //{
-        //    PoseName = poseCreateObj.PoseName,
-        //    PhotoUrl = poseCreateObj.PhotoUrl,
-        //    PoseVariations = poseCreateObj.PoseVariations
-        //};
-
         return await _poseWebData.InsertPoseAsync(_mapper.Map<PoseDto>(poseCreateObj));
     }
 
     public async Task<int> UpdatePose(UpdatePoseModel poseUpdateObj)
     {
-        //UpdatePoseDto tansformedModel = new()
-        //{
-        //    PoseId = poseUpdateObj.PoseId,
-        //    PoseName = poseUpdateObj.PoseName,
-        //    PhotoUrl = poseUpdateObj.PhotoUrl,
-        //    PoseVariations = poseUpdateObj.PoseVariations
-        //};
         return await _poseWebData.UpdatePoseAsync(_mapper.Map<UpdatePoseDto>(poseUpdateObj));
     }
 
