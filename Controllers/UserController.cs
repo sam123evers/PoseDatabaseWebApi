@@ -8,38 +8,38 @@ namespace PoseDatabaseWebApi.Controllers
     [Route("api/[controller]")]
     public class UserController : ControllerBase
     {
-        private readonly IPoseWebService _poseWebService;
-        public UserController(IPoseWebService service)
+        private readonly IUserService _userService;
+        public UserController(IUserService service)
         {
-            _poseWebService = service;
+            _userService = service;
         }
 
-        [HttpGet]
-        [Route("GetUsers")]
-        public async Task<List<UserDataModel>> GetUsersAsync()
-        {
-            return await _poseWebService.GetUserData();
-        }
+        //[HttpGet]
+        //[Route("GetUsers")]
+        //public async Task<List<UserDataModel>> GetUsersAsync()
+        //{
+        //    return await _poseWebService.GetUserData();
+        //}
 
         [HttpPost]
         [Route("CreateUser")]
-        public async Task<int> CreateUserAsync([FromBody] UserDataModel createUserInput)
+        public async Task<bool> CreateUserAsync([FromBody] UserDataModel createUserInput)
         {
-            return await _poseWebService.CreateUser(createUserInput);
+            return await _userService.CreateNewUserAsync(createUserInput.UserName, createUserInput.Password, createUserInput.Email);
         }
 
-        [HttpPut]
-        [Route("UpdateUser")]
-        public async Task<int> UpdateUserAsync([FromBody] UpdateUserDataModel updateUserInput)
-        {
-            return await _poseWebService.UpdateUser(updateUserInput);
-        }
+        //[HttpPut]
+        //[Route("UpdateUser")]
+        //public async Task<int> UpdateUserAsync([FromBody] UpdateUserDataModel updateUserInput)
+        //{
+        //    return await _poseWebService.UpdateUser(updateUserInput);
+        //}
 
-        [HttpDelete]
-        [Route("DeleteUser/{userDataId}")]
-        public async Task<int> DeleteUserAsync([FromRoute]int userDataId)
-        {
-            return await _poseWebService.SetDeleteUser(userDataId);
-        }
+        //[HttpDelete]
+        //[Route("DeleteUser/{userDataId}")]
+        //public async Task<int> DeleteUserAsync([FromRoute]int userDataId)
+        //{
+        //    return await _poseWebService.SetDeleteUser(userDataId);
+        //}
     }
 }

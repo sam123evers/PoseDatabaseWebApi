@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using PoseDatabaseWebApi.Data.Dto;
+using PoseDatabaseWebApi.Data.Dto.Identity.User;
 using PoseDatabaseWebApi.Models;
 
 namespace PoseDatabaseWebApi.Profiles
@@ -8,8 +8,8 @@ namespace PoseDatabaseWebApi.Profiles
     {
         public UserProfile()
         {
-            CreateMap<UserDto, UserDataModel>().ReverseMap();
-            CreateMap<UpdateUserDto, UpdateUserDataModel>().ReverseMap();
+            CreateMap<AspNetUserDto, UserDataModel>().ReverseMap();
+            //CreateMap<UpdateUserDto, UpdateUserDataModel>().ReverseMap();
         }
     }
 }

@@ -1,7 +1,9 @@
 using Npgsql;
+using Microsoft.AspNetCore.Identity;
 using PoseDatabaseWebApi;
 using PoseDatabaseWebApi.Data;
 using PoseDatabaseWebApi.Service;
+using PoseDatabaseWebApi.Data.Identity;
 
 string connectionString = ConfigurationHelper.GetConnectionString("PoseDatabase");
 
@@ -16,8 +18,28 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton(_ => NpgsqlDataSource.Create(connectionString));
 
 // Register data + service layers
-builder.Services.AddScoped<IPoseWebData, PoseWebData>();
+builder.Services.AddScoped<IPoseDataAccess, PoseDataAccess>();
 builder.Services.AddScoped<IPoseWebService, PoseWebService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+//builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => { 
+
+//})
+//.AddDefaultTokenProviders();
+
+builder.Services.AddDataProtection();
+
+builder.Services.AddIdentityCore<IdentityUser>(options => { })
+    .AddUserStore<UserDataAccess>()
+    .AddDefaultTokenProviders();
+
+
+// register password hasher
+builder.Services.AddScoped<IPasswordHasher<IdentityUser>, PasswordHasher<IdentityUser>>();
+
+// register your custom Postgres stores
+builder.Services.AddScoped<IUserStore<IdentityUser>, UserDataAccess>();
+//builder.Services.AddScoped<IRoleStore<IdentityRole>, RoleDataAccess>();
 
 // inject automapper
 builder.Services.AddAutoMapper(typeof(Program));
@@ -36,6 +58,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

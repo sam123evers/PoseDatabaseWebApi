@@ -1,4 +1,4 @@
-﻿namespace PoseDatabaseWebApi.Data.Dto
+﻿namespace PoseDatabaseWebApi.Data.Dto.Pose
 {
     public class UpdatePoseDto
     {

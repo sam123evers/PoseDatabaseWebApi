@@ -1,45 +1,46 @@
 ﻿using AutoMapper;
 using PoseDatabaseWebApi.Data;
-using PoseDatabaseWebApi.Data.Dto;
+//using PoseDatabaseWebApi.Data.Dto.Identity;
+using PoseDatabaseWebApi.Data.Dto.Pose;
 using PoseDatabaseWebApi.Models;
-using System;
+//using System;
 
 namespace PoseDatabaseWebApi.Service;
 
     public class PoseWebService : IPoseWebService
     {
-        private readonly IPoseWebData _poseWebData;
+        private readonly IPoseDataAccess _poseWebData;
         private readonly IMapper _mapper;
-    public PoseWebService(IPoseWebData poseWebData, IMapper mapper) 
-    { 
-        _poseWebData = poseWebData;
-        _mapper = mapper;
-    }
+        public PoseWebService(IPoseDataAccess poseWebData, IMapper mapper) 
+        { 
+            _poseWebData = poseWebData;
+            _mapper = mapper;
+        }
 
-    #region User Methods
-    public async Task<List<UserDataModel>> GetUserData()
-    {
-        List<UserDto> users = await _poseWebData.GetUsersAsync();
-        // one-line? nah...
-        return _mapper.Map<List<UserDataModel>>(users);
-    }
+    //#region User Methods
+    //public async Task<List<UserDataModel>> GetUserData()
+    //{
+    //    List<UserDto> users = await _poseWebData.GetUsersAsync();
+    //    // one-line? nah...
+    //    return _mapper.Map<List<UserDataModel>>(users);
+    //}
 
-    public async Task<int> CreateUser(UserDataModel userCreateObj)
-    {
-        return await _poseWebData.CreateUserAsync(_mapper.Map<UserDto>(userCreateObj));
-    }
+    //public async Task<int> CreateUser(UserDataModel userCreateObj)
+    //{
+    //    return await _poseWebData.CreateUserAsync(_mapper.Map<UserDto>(userCreateObj));
+    //}
 
-    public async Task<int> UpdateUser(UpdateUserDataModel userUpdateObj)
-    {
-        return await _poseWebData.UpdateUserAsync(_mapper.Map<UpdateUserDto>(userUpdateObj));
-    }
+    //public async Task<int> UpdateUser(UpdateUserDataModel userUpdateObj)
+    //{
+    //    return await _poseWebData.UpdateUserAsync(_mapper.Map<UpdateUserDto>(userUpdateObj));
+    //}
 
-    public async Task<int> SetDeleteUser(int userDataId)
-    {
-        return await _poseWebData.SetDeleteUserAsync(userDataId);
-    }
+    //public async Task<int> SetDeleteUser(int userDataId)
+    //{
+    //    return await _poseWebData.SetDeleteUserAsync(userDataId);
+    //}
 
-    #endregion
+    //#endregion
 
     #region Pose Methods
 
