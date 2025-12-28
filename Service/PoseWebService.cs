@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using PoseDatabaseWebApi.Data;
+using PoseDatabaseWebApi.Data.App;
+
 //using PoseDatabaseWebApi.Data.Dto.Identity;
 using PoseDatabaseWebApi.Data.Dto.Pose;
 using PoseDatabaseWebApi.Models;
@@ -9,11 +10,11 @@ namespace PoseDatabaseWebApi.Service;
 
     public class PoseWebService : IPoseWebService
     {
-        private readonly IPoseDataAccess _poseWebData;
+        private readonly IPoseDataAccess _poseDataAccess;
         private readonly IMapper _mapper;
         public PoseWebService(IPoseDataAccess poseWebData, IMapper mapper) 
-        { 
-            _poseWebData = poseWebData;
+        {
+            _poseDataAccess = poseWebData;
             _mapper = mapper;
         }
 
@@ -46,24 +47,24 @@ namespace PoseDatabaseWebApi.Service;
 
     public async Task<List<PoseModel>> GetPoseList()
     {
-        List<PoseDto> poses = await _poseWebData.SelectPoseListAsync();
+        List<PoseDto> poses = await _poseDataAccess.SelectPoseListAsync();
 
         return _mapper.Map<List<PoseModel>>(poses);
     }
 
     public async Task<int> CreatePose(PoseModel poseCreateObj)
     {
-        return await _poseWebData.InsertPoseAsync(_mapper.Map<PoseDto>(poseCreateObj));
+        return await _poseDataAccess.InsertPoseAsync(_mapper.Map<PoseDto>(poseCreateObj));
     }
 
     public async Task<int> UpdatePose(UpdatePoseModel poseUpdateObj)
     {
-        return await _poseWebData.UpdatePoseAsync(_mapper.Map<UpdatePoseDto>(poseUpdateObj));
+        return await _poseDataAccess.UpdatePoseAsync(_mapper.Map<UpdatePoseDto>(poseUpdateObj));
     }
 
     public async Task<int> SetDeletePose(int poseId)
     {
-        return await _poseWebData.SetDeletePoseAsync(poseId);
+        return await _poseDataAccess.SetDeletePoseAsync(poseId);
     }
 
     #endregion

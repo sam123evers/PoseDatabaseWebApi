@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PoseDatabaseWebApi.Service;
-using PoseDatabaseWebApi.Models;
+using PoseDatabaseWebApi.Models.Identity;
 
 namespace PoseDatabaseWebApi.Controllers
 {
@@ -14,19 +14,12 @@ namespace PoseDatabaseWebApi.Controllers
             _userService = service;
         }
 
-        //[HttpGet]
-        //[Route("GetUsers")]
-        //public async Task<List<UserDataModel>> GetUsersAsync()
+        //[HttpPost]
+        //[Route("CreateUser")]
+        //public async Task<bool> CreateUserAsync([FromBody] AppUserModel createUserInput)
         //{
-        //    return await _poseWebService.GetUserData();
+        //    return await _userService.CreateNewUserAsync(createUserInput.UserName, createUserInput.Password, createUserInput.Email);
         //}
-
-        [HttpPost]
-        [Route("CreateUser")]
-        public async Task<bool> CreateUserAsync([FromBody] UserDataModel createUserInput)
-        {
-            return await _userService.CreateNewUserAsync(createUserInput.UserName, createUserInput.Password, createUserInput.Email);
-        }
 
         //[HttpPut]
         //[Route("UpdateUser")]

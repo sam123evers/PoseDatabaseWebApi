@@ -1,11 +1,14 @@
 using Npgsql;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using PoseDatabaseWebApi;
-using PoseDatabaseWebApi.Data;
 using PoseDatabaseWebApi.Service;
 using PoseDatabaseWebApi.Data.Identity;
+using PoseDatabaseWebApi.Data.App;
+using PoseDatabaseWebApi.Models.Identity;
 
-string connectionString = ConfigurationHelper.GetConnectionString("PoseDatabase");
+string connectionString = ConfigurationHelper.GetConnectionString("App");
+string identityConnectionString = ConfigurationHelper.GetConnectionString("Identity");
 
 await using var conn = new NpgsqlConnection(connectionString);
 
@@ -20,7 +23,13 @@ builder.Services.AddSingleton(_ => NpgsqlDataSource.Create(connectionString));
 // Register data + service layers
 builder.Services.AddScoped<IPoseDataAccess, PoseDataAccess>();
 builder.Services.AddScoped<IPoseWebService, PoseWebService>();
-builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ISequenceDataAccess, SequenceDataAccess>();
+builder.Services.AddScoped<ISequenceService, SequenceService>();
+//builder.Services.AddScoped<IUserService, UserService>();
+
+//builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+//    .AddEntityFrameworkStores<AppUsersDbContext>()
+//    .AddDefaultTokenProviders();
 
 //builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => { 
 
@@ -28,18 +37,23 @@ builder.Services.AddScoped<IUserService, UserService>();
 //.AddDefaultTokenProviders();
 
 builder.Services.AddDataProtection();
+builder.Services.AddDbContext<AppUsersDbContext>(options => 
+    options.UseNpgsql(identityConnectionString, options => { options.SetPostgresVersion(18,0); }));
 
-builder.Services.AddIdentityCore<IdentityUser>(options => { })
-    .AddUserStore<UserDataAccess>()
-    .AddDefaultTokenProviders();
+//builder.Services.AddIdentityCore<IdentityUser>(options => { })
+//    .AddUserStore<UserDataAccess>()
+//    .AddDefaultTokenProviders();
 
 
 // register password hasher
-builder.Services.AddScoped<IPasswordHasher<IdentityUser>, PasswordHasher<IdentityUser>>();
+//builder.Services.AddScoped<IPasswordHasher<IdentityUser>, PasswordHasher<IdentityUser>>();
 
 // register your custom Postgres stores
-builder.Services.AddScoped<IUserStore<IdentityUser>, UserDataAccess>();
+//builder.Services.AddScoped<IUserStore<IdentityUser>, UserDataAccess>();
 //builder.Services.AddScoped<IRoleStore<IdentityRole>, RoleDataAccess>();
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<AppUserModel>()
+    .AddEntityFrameworkStores<AppUsersDbContext>();
 
 // inject automapper
 builder.Services.AddAutoMapper(typeof(Program));
@@ -62,5 +76,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapIdentityApi<AppUserModel>();
 
 app.Run();

@@ -43,12 +43,10 @@ namespace PoseDatabaseWebApi.Data.Identity
             throw new NotImplementedException();
         }
 
-        //public async Task<IdentityResult> CreateAsync(IdentityUser user, CancellationToken cancellationToken)
         public async Task<IdentityResult> CreateAsync(IdentityUser user, CancellationToken cancellationToken)
         {
             // open NpgsqlConnection, INSERT into AspNetUsers, return IdentityResult.Success
-            //throw new NotImplementedException();
-            // you might need IdentityUser model for something
+            // throw new NotImplementedException();
 
             var sql = @"
                 INSERT INTO identity.asp_net_users (

@@ -1,7 +1,7 @@
 ﻿using PoseDatabaseWebApi.Data.Dto.Identity;
 using PoseDatabaseWebApi.Data.Dto.Pose;
 
-namespace PoseDatabaseWebApi.Data
+namespace PoseDatabaseWebApi.Data.App
 {
     public interface IPoseDataAccess
     {

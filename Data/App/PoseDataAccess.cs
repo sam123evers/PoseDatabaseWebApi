@@ -2,7 +2,7 @@
 using PoseDatabaseWebApi.Data.Dto.Identity;
 using PoseDatabaseWebApi.Data.Dto.Pose;
 
-namespace PoseDatabaseWebApi.Data
+namespace PoseDatabaseWebApi.Data.App
 {
     public class PoseDataAccess : IPoseDataAccess
     {
@@ -20,7 +20,7 @@ namespace PoseDatabaseWebApi.Data
             var results = new List<PoseDto>();
             var sql = @"
                 SELECT 
-                    pose_id, pose_name, photo_url, pose_variations
+                    pose_id, pose_name, photo_url
                 FROM
                     app.pose
                 WHERE is_deleted = FALSE;
@@ -35,8 +35,7 @@ namespace PoseDatabaseWebApi.Data
                 {
                     PoseId = reader.GetInt32(0),
                     PoseName = reader.GetString(1),
-                    PhotoUrl = reader.GetString(2),
-                    PoseVariations = reader.IsDBNull(3) ? null : reader.GetFieldValue<int[]>(3)
+                    PhotoUrl = reader.GetString(2)
                 });
             }
 
@@ -45,10 +44,9 @@ namespace PoseDatabaseWebApi.Data
 
         public async Task<int> InsertPoseAsync(PoseDto poseCreateObj)
         {
-            await using var cmd = dataSource.CreateCommand("INSERT INTO pose (pose_name, photo_url, pose_variations) VALUES (@pn, @url, @vars) RETURNING pose_id;");
+            await using var cmd = dataSource.CreateCommand("INSERT INTO app.pose (pose_name, photo_url) VALUES (@pn, @url) RETURNING pose_id;");
             cmd.Parameters.AddWithValue("pn", poseCreateObj.PoseName);
             cmd.Parameters.AddWithValue("url", poseCreateObj.PhotoUrl);
-            cmd.Parameters.AddWithValue("vars", (object?)poseCreateObj.PoseVariations ?? DBNull.Value);
             var result = await cmd.ExecuteScalarAsync();
             cmd.Parameters.Clear();
 

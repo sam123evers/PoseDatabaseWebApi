@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PoseDatabaseWebApi.Models;
 using PoseDatabaseWebApi.Service;
 
@@ -17,6 +18,7 @@ namespace PoseDatabaseWebApi.Controllers
 
         [HttpGet]
         [Route("GetPoses")]
+        [Authorize]
         public async Task<List<PoseModel>> GetPosesAsync()
         {
             return await _poseWebService.GetPoseList();
@@ -31,6 +33,7 @@ namespace PoseDatabaseWebApi.Controllers
 
         [HttpPut]
         [Route("UpdatePose")]
+        [Authorize]
         public async Task<int> UpdatePoseAsync([FromBody] UpdatePoseModel updatePoseInput)
         {
             return await _poseWebService.UpdatePose(updatePoseInput);
@@ -38,6 +41,7 @@ namespace PoseDatabaseWebApi.Controllers
 
         [HttpDelete]
         [Route("DeletePose/{poseId}")]
+        [Authorize]
         public async Task<int> DeletePoseAsync([FromRoute] int poseId)
         {
             return await _poseWebService.SetDeletePose(poseId);
