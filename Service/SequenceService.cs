@@ -34,5 +34,20 @@ namespace PoseDatabaseWebApi.Service
         {
             return await _sequenceDataAccess.InsertSequenceAsync(_mapper.Map<SequenceDto>(seqCreateObj), loggedInUserId);
         }
+
+        public async Task<int> UpdateSequence(SequenceModel seqCreateObj)
+        {
+            return await _sequenceDataAccess.UpdateSequenceAsync(_mapper.Map<SequenceDto>(seqCreateObj));
+        }
+
+        public async Task<bool> AddPoseToSequence(SequencePoseModel seqPoseObj)
+        {
+            return await _sequenceDataAccess.AddPoseToSequenceAsync(_mapper.Map<SequencePoseDto>(seqPoseObj));
+        }
+
+        public async Task<bool> RemovePoseFromSequence(int seqPoseId)
+        {
+            return await _sequenceDataAccess.RemovePoseFromSequenceAsync(seqPoseId);
+        }
     }
 }

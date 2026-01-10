@@ -15,9 +15,26 @@ namespace PoseDatabaseWebApi.Service
             _sessionDataAccess = sessionData;
             _mapper = mapper;
         }
-        public async Task<int> CreateSession(SessionModel sessionCreateObj)
+        public async Task<int> CreateSession(SessionModel sessionCreateObj, string userId)
         {
-            return await _sessionDataAccess.InsertSessionAsync(_mapper.Map<SessionDto>(sessionCreateObj));
+            return await _sessionDataAccess.InsertSessionAsync(_mapper.Map<SessionDto>(sessionCreateObj), userId);
+        }
+
+        public async Task<int> UpdateSession(SessionModel seshUpdateObj)
+        {
+            return await _sessionDataAccess.UpdateSessionAsync(_mapper.Map<SessionDto>(seshUpdateObj));
+        }
+
+        public async Task<List<SessionModel>> GetMySessionListWithSequences(string userId)
+        {
+            var sessionDtoList = await _sessionDataAccess.SelectMySessionsAndSequencesAsync(userId);
+            return _mapper.Map<List<SessionModel>>(sessionDtoList);
+        }
+
+        public async Task<List<SessionModel>> GetAllSessionListWithSequences()
+        {
+            var sessionDtoList = await _sessionDataAccess.SelectAllSessionsAndSequencesAsync();
+            return _mapper.Map<List<SessionModel>>(sessionDtoList);
         }
     }
 }

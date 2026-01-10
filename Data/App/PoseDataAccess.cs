@@ -13,8 +13,6 @@ namespace PoseDatabaseWebApi.Data.App
             this.dataSource = dataSource ?? throw new ArgumentNullException(nameof(dataSource));
         }
 
-        #region Poses
-
         public async Task<List<PoseDto>> SelectPoseListAsync()
         {
             var results = new List<PoseDto>();
@@ -27,6 +25,35 @@ namespace PoseDatabaseWebApi.Data.App
                 ".Trim();
 
             await using var cmd = dataSource.CreateCommand(sql);
+            await using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                results.Add(new PoseDto
+                {
+                    PoseId = reader.GetInt32(0),
+                    PoseName = reader.GetString(1),
+                    PhotoUrl = reader.GetString(2)
+                });
+            }
+
+            return results;
+        }
+
+        public async Task<List<PoseDto>> SearchPosesAsync(string searchTerm)
+        {
+            var results = new List<PoseDto>();
+            var sql = @"
+                SELECT 
+                    pose_id, pose_name, photo_url
+                FROM
+                    app.pose
+                WHERE pose_name LIKE '%' || @searchterm || '%' 
+                AND is_deleted = FALSE;
+                ".Trim();
+
+            await using var cmd = dataSource.CreateCommand(sql);
+            cmd.Parameters.AddWithValue("searchterm", searchTerm);
             await using var reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
@@ -106,8 +133,5 @@ namespace PoseDatabaseWebApi.Data.App
 
             return Convert.ToInt32(result);
         }
-
-        #endregion
-
     }
 }

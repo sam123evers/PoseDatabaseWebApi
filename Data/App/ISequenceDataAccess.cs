@@ -9,5 +9,11 @@ namespace PoseDatabaseWebApi.Data.App
         Task<SequenceDto> GetSequenceByIdAsync(int seqId);
 
         Task<int> InsertSequenceAsync(SequenceDto sequenceCreateObj, string loggedInUserId);
+
+        Task<int> UpdateSequenceAsync(SequenceDto seqDto);
+
+        Task<bool> AddPoseToSequenceAsync(SequencePoseDto seqPoseDto);
+
+        Task<bool> RemovePoseFromSequenceAsync(int seqPoseId);
     }
 }

@@ -9,6 +9,7 @@ namespace PoseDatabaseWebApi.Profiles
         public SequenceProfile()
         {
             CreateMap<SequenceDto, SequenceModel>().ReverseMap();
+            CreateMap<SequencePoseDto, SequencePoseModel>().ReverseMap();
         }
     }
 }

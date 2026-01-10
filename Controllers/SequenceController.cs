@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using PoseDatabaseWebApi.Models;
-using PoseDatabaseWebApi.Models.Identity;
 using PoseDatabaseWebApi.Service;
 using System.Security.Claims;
 
@@ -13,13 +12,9 @@ namespace PoseDatabaseWebApi.Controllers
     public class SequenceController : ControllerBase
     {
         private readonly ISequenceService _sequenceService;
-        //private readonly UserManager<AppUserModel> _userManager;
-        public SequenceController(ISequenceService service
-            //, UserManager<AppUserModel> userManager
-            )
+        public SequenceController(ISequenceService service)
         {
             _sequenceService = service;
-            //_userManager = userManager;
         }
 
         [HttpGet]
@@ -43,7 +38,31 @@ namespace PoseDatabaseWebApi.Controllers
         public async Task<int> CreateSequenceAsync([FromBody] SequenceModel seqObj)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return await _sequenceService.CreateSequence(seqObj, userId);
+            return await _sequenceService.CreateSequence(seqObj, userId!);
+        }
+
+        [HttpPut]
+        [Route("UpdateSequence")]
+        [Authorize]
+        public async Task<int> UpdateSequenceAsync([FromBody] SequenceModel updateSeqInput)
+        {
+            return await _sequenceService.UpdateSequence(updateSeqInput);
+        }
+
+        [HttpPost]
+        [Route("AddPoseToSequence")]
+        [Authorize]
+        public async Task<bool> AddPoseToSequenceAsync([FromBody] SequencePoseModel seqPoseObj)
+        {
+            return await _sequenceService.AddPoseToSequence(seqPoseObj);
+        }
+
+        [HttpDelete]
+        [Route("RemovePoseFromSequence")]
+        [Authorize]
+        public async Task<bool> RemovePoseFromSequenceAsync([FromRoute] int seqPoseId)
+        {
+            return await _sequenceService.RemovePoseFromSequence(seqPoseId);
         }
     }
 }

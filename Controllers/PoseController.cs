@@ -25,6 +25,14 @@ namespace PoseDatabaseWebApi.Controllers
         }
 
         [HttpPost]
+        [Route("SearchPoses")]
+        [Authorize]
+        public async Task<List<PoseModel>> SearchPosesAsync([FromBody] string searchTerm)
+        {
+            return await _poseWebService.SearchPoses(searchTerm);
+        }
+
+        [HttpPost]
         [Route("CreatePose")]
         public async Task<int> CreatePoseAsync([FromBody] PoseModel createPoseInput)
         {

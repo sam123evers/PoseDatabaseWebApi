@@ -1,6 +1,8 @@
-﻿using Npgsql;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Npgsql;
 using PoseDatabaseWebApi.Data.Dto.Pose;
 using PoseDatabaseWebApi.Data.Dto.Sequence;
+using PoseDatabaseWebApi.Data.Dto.Session;
 using System.Collections.Generic;
 
 namespace PoseDatabaseWebApi.Data.App
@@ -61,7 +63,6 @@ namespace PoseDatabaseWebApi.Data.App
             if (!await reader.ReadAsync())
                 return null; // or throw new KeyNotFoundException($"Sequence {seqId} not found");
 
-            //var poses = new List<PoseDto>();
             SequenceDto sequence = new();
             sequence.Poses = new List<PoseDto>();
             sequence.SequenceId = reader.GetInt32(0);
@@ -148,6 +149,61 @@ namespace PoseDatabaseWebApi.Data.App
                 // What is going on here?
                 try { await tx.RollbackAsync(); } catch { /* swallow rollback exceptions but log them */ }
                 throw;
+            }
+        }
+
+        public async Task<int> UpdateSequenceAsync(SequenceDto seqDto)
+        {
+            if (seqDto.SequenceId == null)
+            {
+                return -1;
+            }
+            var sequenceUpdate = @"UPDATE app.sequence_data SET sequence_name = @seqName WHERE sequence_id = @seqId";
+            await using var cmd = _dataSource.CreateCommand(sequenceUpdate);
+
+            cmd.Parameters.AddWithValue("seqId", seqDto.SequenceId);
+            cmd.Parameters.AddWithValue("seqName", seqDto.SequenceName);
+            await cmd.ExecuteScalarAsync();
+            cmd.Parameters.Clear();
+
+            return Convert.ToInt32(seqDto.SequenceId);
+        }
+
+        public async Task<bool> AddPoseToSequenceAsync(SequencePoseDto seqPoseDto)
+        {
+            var sql = @"INSERT INTO app.sequence_pose (sequence_id, pose_id) values (@seqId, @poseId, @order)";
+            try 
+            {
+                await using var cmd = _dataSource.CreateCommand(sql);
+                cmd.Parameters.AddWithValue("seqId", seqPoseDto.SequenceId);
+                cmd.Parameters.AddWithValue("poseId", seqPoseDto.PoseId);
+                cmd.Parameters.AddWithValue("order", seqPoseDto.SequencePoseOrder);
+                int rowsEffected = await cmd.ExecuteNonQueryAsync();
+
+                return rowsEffected > 0;
+            }
+            catch(NpgsqlException ex)
+            {   
+                // log the expection
+                return false;
+            }
+        }
+
+        public async Task<bool> RemovePoseFromSequenceAsync(int seqPoseId)
+        {
+            var sql = @"DELETE FROM app.sequence_pose WHERE sequence_pose_id = @seqPoseId";
+            try
+            {
+                await using var cmd = _dataSource.CreateCommand(sql);
+                cmd.Parameters.AddWithValue("seqPoseId", seqPoseId);
+                int rowsEffected = await cmd.ExecuteNonQueryAsync();
+
+                return rowsEffected > 0;
+            }
+            catch (NpgsqlException ex)
+            {
+                // log the expection
+                return false;
             }
         }
     }

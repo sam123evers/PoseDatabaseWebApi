@@ -25,6 +25,8 @@ builder.Services.AddScoped<IPoseDataAccess, PoseDataAccess>();
 builder.Services.AddScoped<IPoseWebService, PoseWebService>();
 builder.Services.AddScoped<ISequenceDataAccess, SequenceDataAccess>();
 builder.Services.AddScoped<ISequenceService, SequenceService>();
+builder.Services.AddScoped<ISessionService, SessionService>();
+builder.Services.AddScoped<ISessionDataAccess, SessionDataAccess>();
 //builder.Services.AddScoped<IUserService, UserService>();
 
 //builder.Services.AddIdentity<IdentityUser, IdentityRole>()

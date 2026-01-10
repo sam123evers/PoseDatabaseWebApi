@@ -1,10 +1,10 @@
-﻿namespace PoseDatabaseWebApi.Data.Dto.Sequence
+﻿namespace PoseDatabaseWebApi.Models
 {
-    public class SequencePoseDto
+    public class SequencePoseModel
     {
         public int? SequencePoseId { get; set; }
         public int SequenceId { get; set; }
         public int PoseId { get; set; }
-        public int SequencePoseOrder { get; set; }
+        public int? PoseOrder { get; set; }
     }
 }
