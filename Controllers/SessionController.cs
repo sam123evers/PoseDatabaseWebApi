@@ -23,6 +23,11 @@ namespace PoseDatabaseWebApi.Controllers
         public async Task<int> CreateSessionAsync([FromBody] SessionModel createSessionInput)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (userId == null)
+            {
+                return -1;
+            }
             return await _sessionService.CreateSession(createSessionInput, userId);
         }
 

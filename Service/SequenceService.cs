@@ -30,9 +30,9 @@ namespace PoseDatabaseWebApi.Service
             return _mapper.Map<SequenceModel>(sequence);
         }
 
-        public async Task<int> CreateSequence(SequenceModel seqCreateObj, string loggedInUserId)
+        public async Task<int> CreateSequence(SequenceCreateModel seqCreateObj, string loggedInUserId)
         {
-            return await _sequenceDataAccess.InsertSequenceAsync(_mapper.Map<SequenceDto>(seqCreateObj), loggedInUserId);
+            return await _sequenceDataAccess.InsertSequenceAsync(seqCreateObj.SessionId, _mapper.Map<SequenceDto>(seqCreateObj), loggedInUserId);
         }
 
         public async Task<int> UpdateSequence(SequenceModel seqCreateObj)

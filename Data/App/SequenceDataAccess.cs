@@ -40,6 +40,7 @@ namespace PoseDatabaseWebApi.Data.App
 
         public async Task<SequenceDto> GetSequenceByIdAsync(int seqId)
         {
+            // currently not getting variant aka "side" from this query
             var sql = @"SELECT 
 	                      seq.sequence_id
 	                    , sequence_name
@@ -47,7 +48,7 @@ namespace PoseDatabaseWebApi.Data.App
 	                    , seqp.sequence_pose_id
 	                    , p.pose_id
 	                    , p.pose_name
-	                    , pv.variant_name
+	                    , p.photo_url
                     FROM app.sequence_data seq
                     JOIN app.sequence_pose seqp ON seq.sequence_id = seqp.sequence_id
                     JOIN app.pose p ON seqp.pose_id = p.pose_id
@@ -72,7 +73,8 @@ namespace PoseDatabaseWebApi.Data.App
             var firstPose = new PoseDto
             {
                 PoseId = reader.GetInt32(4),
-                PoseName = reader.IsDBNull(5) ? string.Empty : reader.GetString(5)
+                PoseName = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
+                PhotoUrl = reader.IsDBNull(6) ? string.Empty : reader.GetString(6)
             };
             sequence.Poses.Add(firstPose);
 
@@ -80,7 +82,8 @@ namespace PoseDatabaseWebApi.Data.App
                 var pose = new PoseDto
                 {
                     PoseId = reader.GetInt32(4),
-                    PoseName = reader.IsDBNull(5) ? string.Empty : reader.GetString(5)
+                    PoseName = reader.IsDBNull(5) ? string.Empty : reader.GetString(5),
+                    PhotoUrl = reader.IsDBNull(6) ? string.Empty : reader.GetString(6)
                 };
                 sequence.Poses.Add(pose);
             }
@@ -88,8 +91,10 @@ namespace PoseDatabaseWebApi.Data.App
             return sequence;
         }
 
-        public async Task<int> InsertSequenceAsync(SequenceDto sequenceCreateObj, string loggedInUserId)
+        public async Task<int> InsertSequenceAsync(int sessionId, SequenceDto sequenceCreateObj, string loggedInUserId)
         {
+
+            // ADD A SEQUENCE TO AN EXISTING SESSION ...
             await using var conn = await _dataSource.OpenConnectionAsync();
             var tx = await conn.BeginTransactionAsync();
             try
@@ -97,27 +102,26 @@ namespace PoseDatabaseWebApi.Data.App
                 await using (var cmd = conn.CreateCommand())
                 {
                     // create session ...
-                    cmd.Transaction = tx;
-                    cmd.CommandText = @"
-                        INSERT INTO app.session_data
-                        DEFAULT VALUES
-                        RETURNING session_id;
-                    ";
-                    //cmd.Parameters.AddWithValue("sn", $"My Session #1" ?? string.Empty);
+                    //cmd.Transaction = tx;
+                    //cmd.CommandText = @"
+                    //    INSERT INTO app.session_data
+                    //    DEFAULT VALUES
+                    //    RETURNING session_id;
+                    //";
 
-                    var sessionIdObj = await cmd.ExecuteScalarAsync();
-                    var sessionId = Convert.ToInt32(sessionIdObj);
-                    cmd.Parameters.Clear();
+                    //var sessionIdObj = await cmd.ExecuteScalarAsync();
+                    //var sessionId = Convert.ToInt32(sessionIdObj);
+                    //cmd.Parameters.Clear();
 
                     // insert user_session link
-                    cmd.CommandText = @"
-                        INSERT INTO app.user_session(user_id, session_id)
-                        VALUES (@uId, @seshId);
-                    ";
-                    cmd.Parameters.AddWithValue("uId", loggedInUserId);
-                    cmd.Parameters.AddWithValue("seshId", sessionId);
-                    await cmd.ExecuteScalarAsync();
-                    cmd.Parameters.Clear();
+                    //cmd.CommandText = @"
+                    //    INSERT INTO app.user_session(user_id, session_id)
+                    //    VALUES (@uId, @seshId);
+                    //";
+                    //cmd.Parameters.AddWithValue("uId", loggedInUserId);
+                    //cmd.Parameters.AddWithValue("seshId", sessionId);
+                    //await cmd.ExecuteScalarAsync();
+                    //cmd.Parameters.Clear();
 
                     // create sequence ...
                     cmd.CommandText = @"
@@ -171,7 +175,7 @@ namespace PoseDatabaseWebApi.Data.App
 
         public async Task<bool> AddPoseToSequenceAsync(SequencePoseDto seqPoseDto)
         {
-            var sql = @"INSERT INTO app.sequence_pose (sequence_id, pose_id) values (@seqId, @poseId, @order)";
+            var sql = @"INSERT INTO app.sequence_pose (sequence_id, pose_id, sequence_pose_order) values (@seqId, @poseId, @order)";
             try 
             {
                 await using var cmd = _dataSource.CreateCommand(sql);

@@ -154,7 +154,7 @@ namespace PoseDatabaseWebApi.Data.App
         {
             var sessionInsert = @"INSERT INTO app.session_data(session_name, session_alternate_name) VALUES (@sn, @sal) RETURNING session_id;";
             await using var cmd = _dataSource.CreateCommand(sessionInsert);
-            
+
             cmd.Parameters.AddWithValue("sn", sessionCreateObj.SessionName);
             cmd.Parameters.AddWithValue("sal", sessionCreateObj.SessionAlternateName);
             var seshId = await cmd.ExecuteScalarAsync();
@@ -165,10 +165,10 @@ namespace PoseDatabaseWebApi.Data.App
             ";
 
             await using var cmd2 = _dataSource.CreateCommand(userSessionInsert);
-            cmd.Parameters.AddWithValue("uId", userId);
-            cmd.Parameters.AddWithValue("seshId", Convert.ToInt32(seshId));
-            await cmd.ExecuteNonQueryAsync();
-            cmd.Parameters.Clear();
+            cmd2.Parameters.AddWithValue("uId", userId);
+            cmd2.Parameters.AddWithValue("seshId", Convert.ToInt32(seshId));
+            await cmd2.ExecuteNonQueryAsync();
+            cmd2.Parameters.Clear();
 
             if (seshId == null || seshId == DBNull.Value)
             {
