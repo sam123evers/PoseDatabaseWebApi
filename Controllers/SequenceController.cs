@@ -38,7 +38,7 @@ namespace PoseDatabaseWebApi.Controllers
         public async Task<int> CreateSequenceAsync([FromBody] SequenceCreateModel newSeqObj)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return await _sequenceService.CreateSequence(newSeqObj, userId!);
+            return await _sequenceService.CreateSequence(seqObj, userId!);
         }
 
         [HttpPut]
