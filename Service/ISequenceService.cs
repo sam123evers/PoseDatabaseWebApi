@@ -9,7 +9,11 @@ namespace PoseDatabaseWebApi.Service
 
         Task<SequenceModel> GetSequenceByIdAsync(int sequenceId);
 
-        Task<int> CreateSequence(SequenceModel seqCreateObj, string loggedInUserId);
+        Task<List<SequenceModel>> GetSequencesAndPosesBySeshIdAsync(int seshId);
+
+        Task<int> CreateSequence(SequenceCreateModel seqCreateObj);
+
+        //Task<int> CreateSequence(SequenceModel seqCreateObj, string loggedInUserId);
 
         Task<int> UpdateSequence(SequenceModel seqCreateObj);
 

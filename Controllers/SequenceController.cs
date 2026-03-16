@@ -32,13 +32,22 @@ namespace PoseDatabaseWebApi.Controllers
             return await _sequenceService.GetSequenceByIdAsync(id);
         }
 
+        [HttpGet]
+        [Route("SequencesAndPoses/{sessionId}")]
+        public async Task<List<SequenceModel>> GetSeqAndPoseListBySeshId([FromRoute] int sessionId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return await _sequenceService.GetSequencesAndPosesBySeshIdAsync(sessionId);
+        }
+
         [HttpPost]
         [Route("CreateSequence")]
-        //[Authorize]
+
         public async Task<int> CreateSequenceAsync([FromBody] SequenceCreateModel newSeqObj)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return await _sequenceService.CreateSequence(seqObj, userId!);
+            return await _sequenceService.CreateSequence(newSeqObj);
+            //    return await _sequenceService.CreateSequence(newSeqObj, userId!);
         }
 
         [HttpPut]
