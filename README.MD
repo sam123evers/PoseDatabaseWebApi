@@ -5,15 +5,14 @@
 - Npgsql for application data access
 - Entity Framework Core for identity
 
-Migrations:
+Migrations (for Identity Tables):
 - dotnet ef migrations add <Migration Name>
 - dotnet ef database update
 
 MVP:
 - user can reorder poses in a sequence!
 - user can reorder sequences in a session!
-- user can add a sequence to a session
-- user can remove a sequence from a session
+- user can remove a sequence from a session.. which will delete the sequence entirely
 
 Issues:
 - creating a session adds a session to the db and creates a link between the session and the user, but does not create any sequences in the session
@@ -28,7 +27,8 @@ but we also don't want a new session for every sequence that is created
 
 
 Flow:  The user starts by creating a session.
-it's implied that all of the sequences are going to be part of that session,
+it's implied that all of the sequences are going to be part of that session.
+If there are 2 sessions, the user should be "in" one when they create a sequence.
 unless the user says they want to move it to a different session,
 which can have a default name
 

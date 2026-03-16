@@ -1,9 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
+﻿//using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Npgsql;
 using PoseDatabaseWebApi.Data.Dto.Pose;
 using PoseDatabaseWebApi.Data.Dto.Sequence;
-using PoseDatabaseWebApi.Data.Dto.Session;
-using System.Collections.Generic;
+//using PoseDatabaseWebApi.Data.Dto.Session;
+//using System.Collections.Generic;
 
 namespace PoseDatabaseWebApi.Data.App
 {
@@ -30,8 +30,7 @@ namespace PoseDatabaseWebApi.Data.App
                 results.Add(new SequenceDto
                 {
                     SequenceId = reader.GetInt32(0),
-                    SequenceName = reader.GetString(1),
-                    SequenceAlternateName = reader.IsDBNull(2) ? string.Empty : reader.GetString(2)
+                    SequenceName = reader.GetString(1)
                 });
             }
 
@@ -68,7 +67,6 @@ namespace PoseDatabaseWebApi.Data.App
             sequence.Poses = new List<PoseDto>();
             sequence.SequenceId = reader.GetInt32(0);
             sequence.SequenceName = reader.IsDBNull(1) ? string.Empty : reader.GetString(1);
-            sequence.SequenceAlternateName = reader.IsDBNull(2) ? string.Empty : reader.GetString(2);
 
             var firstPose = new PoseDto
             {
@@ -101,27 +99,6 @@ namespace PoseDatabaseWebApi.Data.App
             {
                 await using (var cmd = conn.CreateCommand())
                 {
-                    // create session ...
-                    //cmd.Transaction = tx;
-                    //cmd.CommandText = @"
-                    //    INSERT INTO app.session_data
-                    //    DEFAULT VALUES
-                    //    RETURNING session_id;
-                    //";
-
-                    //var sessionIdObj = await cmd.ExecuteScalarAsync();
-                    //var sessionId = Convert.ToInt32(sessionIdObj);
-                    //cmd.Parameters.Clear();
-
-                    // insert user_session link
-                    //cmd.CommandText = @"
-                    //    INSERT INTO app.user_session(user_id, session_id)
-                    //    VALUES (@uId, @seshId);
-                    //";
-                    //cmd.Parameters.AddWithValue("uId", loggedInUserId);
-                    //cmd.Parameters.AddWithValue("seshId", sessionId);
-                    //await cmd.ExecuteScalarAsync();
-                    //cmd.Parameters.Clear();
 
                     // create sequence ...
                     cmd.CommandText = @"

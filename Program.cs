@@ -9,12 +9,20 @@ using PoseDatabaseWebApi.Models.Identity;
 
 string connectionString = ConfigurationHelper.GetConnectionString("App");
 string identityConnectionString = ConfigurationHelper.GetConnectionString("Identity");
+string corsPolicyName = "AllowSeshBuilderFrontEnd";
 
 await using var conn = new NpgsqlConnection(connectionString);
 
 await using var dataSource = NpgsqlDataSource.Create(connectionString);
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddProblemDetails(configure =>
+{
+    configure.CustomizeProblemDetails = context => context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
+});
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 // Add services to the container.
 // Register NpgsqlDataSource as a singleton(DI will dispose at shutdown)
@@ -64,6 +72,18 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: corsPolicyName,
+        builder =>
+        {
+            builder.WithOrigins("http://localhost:5174", "http://localhost:5173")
+                   .AllowAnyHeader()
+                   .AllowAnyMethod()
+                   .AllowCredentials();
+        });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -73,6 +93,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(corsPolicyName);
+
+app.UseExceptionHandler();
 
 app.UseAuthentication();
 app.UseAuthorization();

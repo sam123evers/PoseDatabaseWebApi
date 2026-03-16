@@ -50,7 +50,7 @@ namespace PoseDatabaseWebApi.Controllers
 
         [HttpGet]
         [Route("GetAllSessions")]
-        [Authorize]
+        //[Authorize]
         public async Task<List<SessionModel>> GetAllSessionsAsync()
         {
             //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);

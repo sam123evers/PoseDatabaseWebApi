@@ -18,7 +18,7 @@ namespace PoseDatabaseWebApi.Controllers
 
         [HttpGet]
         [Route("GetPoses")]
-        [Authorize]
+        //[Authorize]
         public async Task<List<PoseModel>> GetPosesAsync()
         {
             return await _poseWebService.GetPoseList();
