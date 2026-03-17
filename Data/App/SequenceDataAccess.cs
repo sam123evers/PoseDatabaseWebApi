@@ -59,8 +59,8 @@ namespace PoseDatabaseWebApi.Data.App
 
             await using var reader = await cmd.ExecuteReaderAsync();
 
-            if (!await reader.ReadAsync())
-                return null; // or throw new KeyNotFoundException($"Sequence {seqId} not found");
+            //if (!await reader.ReadAsync())
+            //    return null; // or throw new KeyNotFoundException($"Sequence {seqId} not found");
 
             SequenceDto sequence = new();
             sequence.Poses = new List<PoseDto>();
@@ -98,9 +98,8 @@ namespace PoseDatabaseWebApi.Data.App
                     FROM app.session_data sesh
                     JOIN app.session_sequence sesh_seq ON sesh.session_id = sesh_seq.session_id
                     JOIN app.sequence_data seq ON sesh_seq.sequence_id = seq.sequence_id
-                    JOIN app.sequence_pose seqp ON seq.sequence_id = seqp.sequence_id
-                    JOIN app.pose p ON seqp.pose_id = p.pose_id
-                    LEFT JOIN app.pose_variant pv ON pv.pose_variant_id = seqp.pose_variant_id
+                    LEFT JOIN app.sequence_pose seqp ON seq.sequence_id = seqp.sequence_id
+                    LEFT JOIN app.pose p ON seqp.pose_id = p.pose_id
                     WHERE sesh.session_id = @seshId
                     ORDER BY seqp.sequence_pose_order;".Trim();
 
@@ -150,144 +149,52 @@ namespace PoseDatabaseWebApi.Data.App
                     sequences.Add(sequenceId, sequence);
                 }
 
-                var pose = new PoseDto
+                if (!reader.IsDBNull(2)) 
                 {
-                    PoseId = reader.GetInt32(2),
-                    PoseName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                    PhotoUrl = reader.IsDBNull(4) ? string.Empty : reader.GetString(4)
-                };
-                sequence.Poses.Add(pose);
+                    var pose = new PoseDto
+                    {
+                        PoseId = reader.GetInt32(2),
+                        PoseName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
+                        PhotoUrl = reader.IsDBNull(4) ? string.Empty : reader.GetString(4)
+                    };
+                    sequence.Poses.Add(pose);
+                }
             }
 
             return sequences.Values.ToList();
         }
 
-        //public async Task<int> InsertSequenceAsync(SequenceDto sequenceCreateObj, string loggedInUserId)
-        //{
-        //    await using var conn = await _dataSource.OpenConnectionAsync();
-        //    var tx = await conn.BeginTransactionAsync();
-        //    try
-        //    {
-        //        await using (var cmd = conn.CreateCommand())
-        //        {
-        //            // create session ...
-        //            cmd.Transaction = tx;
-        //            cmd.CommandText = @"
-        //                INSERT INTO app.session_data
-        //                DEFAULT VALUES
-        //                RETURNING session_id;
-        //            ";
-        //            //cmd.Parameters.AddWithValue("sn", $"My Session #1" ?? string.Empty);
-
-        //            var sessionIdObj = await cmd.ExecuteScalarAsync();
-        //            var sessionId = Convert.ToInt32(sessionIdObj);
-        //            cmd.Parameters.Clear();
-
-        //            // insert user_session link
-        //            cmd.CommandText = @"
-        //                INSERT INTO app.user_session(user_id, session_id)
-        //                VALUES (@uId, @seshId);
-        //            ";
-        //            cmd.Parameters.AddWithValue("uId", loggedInUserId);
-        //            cmd.Parameters.AddWithValue("seshId", sessionId);
-        //            await cmd.ExecuteScalarAsync();
-        //            cmd.Parameters.Clear();
-
-        //            // create sequence ...
-        //            cmd.CommandText = @"
-        //                INSERT INTO app.sequence_data (sequence_name)
-        //                VALUES (@seqname)
-        //                RETURNING sequence_id;
-        //            ";
-        //            cmd.Parameters.AddWithValue("seqname", sequenceCreateObj.SequenceName);
-        //            var sequenceIdObj = await cmd.ExecuteScalarAsync();
-        //            var sequenceId = Convert.ToInt32(sequenceIdObj);
-        //            cmd.Parameters.Clear();
-
-        //            // link sequence to session
-        //            cmd.CommandText = @"
-        //                INSERT INTO app.session_sequence (session_id, sequence_id)
-        //                VALUES (@seshId, @seqId)
-        //            ;";
-
-        //            cmd.Parameters.AddWithValue("seshId", sessionId);
-        //            cmd.Parameters.AddWithValue("seqId", sequenceId);
-        //            await cmd.ExecuteScalarAsync();
-
-        //            await tx.CommitAsync();
-        //            return sequenceId;
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        // What is going on here?
-        //        try { await tx.RollbackAsync(); } catch { /* swallow rollback exceptions but log them */ }
-        //        throw;
-        //    }
-        //}
-
         public async Task<int> InsertSequenceAsync(SequenceCreateDto sequenceCreateObj)
         {
             await using var conn = await _dataSource.OpenConnectionAsync();
             var tx = await conn.BeginTransactionAsync();
-            try
+            
+            await using (var cmd = conn.CreateCommand())
             {
-                await using (var cmd = conn.CreateCommand())
-                {
-                    // create session ...
-                    //cmd.Transaction = tx;
-                    //cmd.CommandText = @"
-                    //    INSERT INTO app.session_data
-                    //    DEFAULT VALUES
-                    //    RETURNING session_id;
-                    //";
-                    //cmd.Parameters.AddWithValue("sn", $"My Session #1" ?? string.Empty);
+                // create sequence ...
+                cmd.CommandText = @"
+                    INSERT INTO app.sequence_data (sequence_name)
+                    VALUES (@seqname)
+                    RETURNING sequence_id;
+                ";
 
-                    //var sessionIdObj = await cmd.ExecuteScalarAsync();
-                    //var sessionId = Convert.ToInt32(sessionIdObj);
-                    //cmd.Parameters.Clear();
+                cmd.Parameters.AddWithValue("seqname", sequenceCreateObj.SequenceName);
+                var sequenceIdObj = await cmd.ExecuteScalarAsync();
+                var sequenceId = Convert.ToInt32(sequenceIdObj);
+                cmd.Parameters.Clear();
 
-                    // insert user_session link
-                    //cmd.CommandText = @"
-                    //    INSERT INTO app.user_session(user_id, session_id)
-                    //    VALUES (@uId, @seshId);
-                    //";
-                    //cmd.Parameters.AddWithValue("uId", loggedInUserId);
-                    //cmd.Parameters.AddWithValue("seshId", sequenceCreateObj.SessionId);
-                    //await cmd.ExecuteScalarAsync();
-                    //cmd.Parameters.Clear();
+                // link sequence to session
+                cmd.CommandText = @"
+                    INSERT INTO app.session_sequence (session_id, sequence_id)
+                    VALUES (@seshId, @seqId)
+                ;";
 
-                    // create sequence ...
-                    cmd.CommandText = @"
-                        INSERT INTO app.sequence_data (sequence_name)
-                        VALUES (@seqname)
-                        RETURNING sequence_id;
-                    ";
+                cmd.Parameters.AddWithValue("seshId", sequenceCreateObj.SessionId);
+                cmd.Parameters.AddWithValue("seqId", sequenceId);
+                await cmd.ExecuteScalarAsync();
 
-                    cmd.Parameters.AddWithValue("seqname", sequenceCreateObj.SequenceName);
-                    var sequenceIdObj = await cmd.ExecuteScalarAsync();
-                    var sequenceId = Convert.ToInt32(sequenceIdObj);
-                    cmd.Parameters.Clear();
-
-                    // link sequence to session
-                    cmd.CommandText = @"
-                        INSERT INTO app.session_sequence (session_id, sequence_id)
-                        VALUES (@seshId, @seqId)
-                    ;";
-
-                    cmd.Parameters.AddWithValue("seshId", sequenceCreateObj.SessionId);
-                    cmd.Parameters.AddWithValue("seqId", sequenceId);
-                    await cmd.ExecuteScalarAsync();
-
-                    await tx.CommitAsync();
-                    return sequenceId;
-                }
-            }
-            catch
-            {
-                // What is going on here?
-                try { await tx.RollbackAsync(); } catch { /* swallow rollback exceptions but log them */ }
-                throw;
+                await tx.CommitAsync();
+                return sequenceId;
             }
         }
 
