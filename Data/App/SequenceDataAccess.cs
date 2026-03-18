@@ -95,6 +95,7 @@ namespace PoseDatabaseWebApi.Data.App
 	                    , p.pose_id
 	                    , p.pose_name
 	                    , p.photo_url
+                        , seqp.sequence_pose_id
                     FROM app.session_data sesh
                     JOIN app.session_sequence sesh_seq ON sesh.session_id = sesh_seq.session_id
                     JOIN app.sequence_data seq ON sesh_seq.sequence_id = seq.sequence_id
@@ -116,19 +117,26 @@ namespace PoseDatabaseWebApi.Data.App
 
             var firstSequenceId = reader.GetInt32(0);
 
-            var firstSequence = new SequenceDto
+            List<PoseDto>? firstPoses = null;
+            if (!reader.IsDBNull(2)) 
             {
-                SequenceId = reader.GetInt32(0),
-                SequenceName = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
-                Poses = new List<PoseDto>
+                firstPoses = new List<PoseDto>
                 {
                     new PoseDto
                     {
                         PoseId = reader.GetInt32(2),
                         PoseName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                        PhotoUrl = reader.IsDBNull(4) ? string.Empty : reader.GetString(4)
+                        PhotoUrl = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
+                        SequencePoseId = reader.GetInt32(5)
                     }
-                },
+                };
+            }
+
+            var firstSequence = new SequenceDto
+            {
+                SequenceId = reader.GetInt32(0),
+                SequenceName = reader.IsDBNull(1) ? string.Empty : reader.GetString(1),
+                Poses = firstPoses
             };
 
             sequences.Add(firstSequenceId, firstSequence);
@@ -155,7 +163,8 @@ namespace PoseDatabaseWebApi.Data.App
                     {
                         PoseId = reader.GetInt32(2),
                         PoseName = reader.IsDBNull(3) ? string.Empty : reader.GetString(3),
-                        PhotoUrl = reader.IsDBNull(4) ? string.Empty : reader.GetString(4)
+                        PhotoUrl = reader.IsDBNull(4) ? string.Empty : reader.GetString(4),
+                        SequencePoseId = reader.GetInt32(5)
                     };
                     sequence.Poses.Add(pose);
                 }
@@ -217,40 +226,27 @@ namespace PoseDatabaseWebApi.Data.App
 
         public async Task<bool> AddPoseToSequenceAsync(SequencePoseDto seqPoseDto)
         {
-            var sql = @"INSERT INTO app.sequence_pose (sequence_id, pose_id) values (@seqId, @poseId, @order)";
-            try 
-            {
-                await using var cmd = _dataSource.CreateCommand(sql);
-                cmd.Parameters.AddWithValue("seqId", seqPoseDto.SequenceId);
-                cmd.Parameters.AddWithValue("poseId", seqPoseDto.PoseId);
-                cmd.Parameters.AddWithValue("order", seqPoseDto.SequencePoseOrder);
-                int rowsEffected = await cmd.ExecuteNonQueryAsync();
+            var sql = @"INSERT INTO app.sequence_pose (sequence_id, pose_id, sequence_pose_order) values (@seqId, @poseId, @order)";
+            
+            await using var cmd = _dataSource.CreateCommand(sql);
+            cmd.Parameters.AddWithValue("seqId", seqPoseDto.SequenceId);
+            cmd.Parameters.AddWithValue("poseId", seqPoseDto.PoseId);
+            cmd.Parameters.AddWithValue("order", seqPoseDto.SequencePoseOrder);
+            int rowsEffected = await cmd.ExecuteNonQueryAsync();
 
-                return rowsEffected > 0;
-            }
-            catch(NpgsqlException ex)
-            {   
-                // log the expection
-                return false;
-            }
+            return rowsEffected > 0;
         }
 
         public async Task<bool> RemovePoseFromSequenceAsync(int seqPoseId)
         {
             var sql = @"DELETE FROM app.sequence_pose WHERE sequence_pose_id = @seqPoseId";
-            try
-            {
-                await using var cmd = _dataSource.CreateCommand(sql);
-                cmd.Parameters.AddWithValue("seqPoseId", seqPoseId);
-                int rowsEffected = await cmd.ExecuteNonQueryAsync();
+            
+            await using var cmd = _dataSource.CreateCommand(sql);
+            cmd.Parameters.AddWithValue("seqPoseId", seqPoseId);
+            int rowsEffected = await cmd.ExecuteNonQueryAsync();
 
-                return rowsEffected > 0;
-            }
-            catch (NpgsqlException ex)
-            {
-                // log the expection
-                return false;
-            }
+            return rowsEffected > 0;
+            
         }
     }
 }

@@ -66,7 +66,12 @@ builder.Services.AddIdentityApiEndpoints<AppUserModel>()
     .AddEntityFrameworkStores<AppUsersDbContext>();
 
 // inject automapper
-builder.Services.AddAutoMapper(typeof(Program));
+//builder.Services.AddAutoMapper(typeof(Program));
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddMaps(typeof(Program).Assembly); // Scans the assembly where Program is located
+    // Or cfg.AddMaps(typeof(SomeClassInAnotherAssembly).Assembly); to scan a different project
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

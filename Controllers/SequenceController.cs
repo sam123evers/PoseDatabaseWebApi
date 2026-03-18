@@ -60,15 +60,15 @@ namespace PoseDatabaseWebApi.Controllers
 
         [HttpPost]
         [Route("AddPoseToSequence")]
-        [Authorize]
+        //[Authorize]
         public async Task<bool> AddPoseToSequenceAsync([FromBody] SequencePoseModel seqPoseObj)
         {
-            return await _sequenceService.AddPoseToSequence(seqPoseObj);
+            return await _sequenceService.AddPoseToSequence(seqPoseObj); ;
         }
 
         [HttpDelete]
-        [Route("RemovePoseFromSequence")]
-        [Authorize]
+        [Route("RemovePoseFromSequence/{seqPoseId}")]
+        //[Authorize]
         public async Task<bool> RemovePoseFromSequenceAsync([FromRoute] int seqPoseId)
         {
             return await _sequenceService.RemovePoseFromSequence(seqPoseId);

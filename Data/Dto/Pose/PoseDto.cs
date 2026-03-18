@@ -6,5 +6,7 @@
         public string PoseName { get; set; }
         public string PhotoUrl { get; set; }
 
+        public int SequencePoseId { get; set; }
+
     }
 }
