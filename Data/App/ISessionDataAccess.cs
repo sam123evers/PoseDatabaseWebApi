@@ -8,5 +8,6 @@ namespace PoseDatabaseWebApi.Data.App
         Task<List<SessionDto>> SelectMySessionsAndSequencesAsync(string userId);
         Task<int> InsertSessionAsync(SessionDto sessionCreateObj, string userId);
         Task<int> UpdateSessionAsync(SessionDto seshDto);
+        Task<bool> RemoveSequenceFromSessionAsync(int seqId);
     }
 }

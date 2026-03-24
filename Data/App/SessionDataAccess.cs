@@ -193,9 +193,17 @@ namespace PoseDatabaseWebApi.Data.App
             await cmd.ExecuteScalarAsync();
             cmd.Parameters.Clear();
 
-            
-
             return (int)seshDto.SessionId;
+        }
+
+        public async Task<bool> RemoveSequenceFromSessionAsync(int seqId)
+        {
+            var deleteSql = @"DELETE FROM app.sequence_data WHERE sequence_id = @seqId;";
+            await using var deleteCmd = _dataSource.CreateCommand(deleteSql);
+            deleteCmd.Parameters.AddWithValue("seqId", seqId);
+            var rows = await deleteCmd.ExecuteNonQueryAsync();
+
+            return rows > 0;
         }
     }
 }

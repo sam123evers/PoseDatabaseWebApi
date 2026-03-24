@@ -11,5 +11,7 @@ namespace PoseDatabaseWebApi.Service
         Task<List<SessionModel>> GetMySessionListWithSequences(string userId);
 
         Task<List<SessionModel>> GetAllSessionListWithSequences();
+
+        Task<bool> RemoveSequenceFromSession(int seshSeqId);
     }
 }

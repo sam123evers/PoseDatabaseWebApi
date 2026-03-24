@@ -36,5 +36,10 @@ namespace PoseDatabaseWebApi.Service
             var sessionDtoList = await _sessionDataAccess.SelectAllSessionsAndSequencesAsync();
             return _mapper.Map<List<SessionModel>>(sessionDtoList);
         }
+
+        public async Task<bool> RemoveSequenceFromSession(int seqId)
+        {
+            return await _sessionDataAccess.RemoveSequenceFromSessionAsync(seqId);
+        }
     }
 }

@@ -51,5 +51,14 @@ namespace PoseDatabaseWebApi.Controllers
             //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return await _sessionService.GetAllSessionListWithSequences();
         }
+
+        [HttpDelete]
+        [Route("RemoveSequence/{seqId}")]
+        //[Authorize]
+        public async Task<bool> RemoveSequenceFromSessionAsync([FromRoute] int seqId)
+        {
+            // optionally check authorization: ensure current user owns the session if necessary
+            return await _sessionService.RemoveSequenceFromSession(seqId);
+        }
     }
 }
