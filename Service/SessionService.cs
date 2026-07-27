@@ -10,11 +10,14 @@ namespace PoseDatabaseWebApi.Service
     {
         private readonly ISessionDataAccess _sessionDataAccess;
         private readonly IMapper _mapper;
-        public SessionService(ISessionDataAccess sessionData, IMapper mapper)
+        private readonly ILogger<SessionService> _logger;
+        public SessionService(ISessionDataAccess sessionData, IMapper mapper, ILogger<SessionService> logger)
         {
             _sessionDataAccess = sessionData;
             _mapper = mapper;
+            _logger = logger;
         }
+
         public async Task<int> CreateSession(SessionModel sessionCreateObj, string userId)
         {
             return await _sessionDataAccess.InsertSessionAsync(_mapper.Map<SessionDto>(sessionCreateObj), userId);
@@ -27,18 +30,21 @@ namespace PoseDatabaseWebApi.Service
 
         public async Task<List<SessionModel>> GetMySessionListWithSequences(string userId)
         {
+            _logger.LogInformation("Getting Sessions for UserId: {userId}", userId);
             var sessionDtoList = await _sessionDataAccess.SelectMySessionsAndSequencesAsync(userId);
             return _mapper.Map<List<SessionModel>>(sessionDtoList);
         }
 
         public async Task<List<SessionModel>> GetAllSessionListWithSequences()
         {
+            _logger.LogInformation("Getting all Sessions");
             var sessionDtoList = await _sessionDataAccess.SelectAllSessionsAndSequencesAsync();
             return _mapper.Map<List<SessionModel>>(sessionDtoList);
         }
 
         public async Task<bool> RemoveSequenceFromSession(int seqId)
         {
+            _logger.LogInformation("Removing Sequence from Session: {seqId}", seqId);
             return await _sessionDataAccess.RemoveSequenceFromSessionAsync(seqId);
         }
     }

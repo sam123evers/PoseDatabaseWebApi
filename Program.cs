@@ -6,107 +6,109 @@ using PoseDatabaseWebApi.Service;
 using PoseDatabaseWebApi.Data.Identity;
 using PoseDatabaseWebApi.Data.App;
 using PoseDatabaseWebApi.Models.Identity;
+using Serilog;
 
-string connectionString = ConfigurationHelper.GetConnectionString("App");
-string identityConnectionString = ConfigurationHelper.GetConnectionString("Identity");
 string corsPolicyName = "AllowSeshBuilderFrontEnd";
 
-await using var conn = new NpgsqlConnection(connectionString);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("logs/logs-.json", rollingInterval: RollingInterval.Day)
+    .CreateBootstrapLogger();
 
-await using var dataSource = NpgsqlDataSource.Create(connectionString);
-
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddProblemDetails(configure =>
+try
 {
-    configure.CustomizeProblemDetails = context => context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
-});
+    Log.Information("Starting Sesh Builder");
 
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+    var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Register NpgsqlDataSource as a singleton(DI will dispose at shutdown)
-builder.Services.AddSingleton(_ => NpgsqlDataSource.Create(connectionString));
+    string connectionString = ConfigurationHelper.GetConnectionString("App");
+    string identityConnectionString = ConfigurationHelper.GetConnectionString("Identity");
 
-// Register data + service layers
-builder.Services.AddScoped<IPoseDataAccess, PoseDataAccess>();
-builder.Services.AddScoped<IPoseWebService, PoseWebService>();
-builder.Services.AddScoped<ISequenceDataAccess, SequenceDataAccess>();
-builder.Services.AddScoped<ISequenceService, SequenceService>();
-builder.Services.AddScoped<ISessionService, SessionService>();
-builder.Services.AddScoped<ISessionDataAccess, SessionDataAccess>();
-//builder.Services.AddScoped<IUserService, UserService>();
+    builder.Services.AddSerilog((services, lc) => lc
+        .ReadFrom.Configuration(builder.Configuration)
+        .ReadFrom.Services(services));
 
-//builder.Services.AddIdentity<IdentityUser, IdentityRole>()
-//    .AddEntityFrameworkStores<AppUsersDbContext>()
-//    .AddDefaultTokenProviders();
+    builder.Services.AddProblemDetails(configure =>
+    {
+        configure.CustomizeProblemDetails = context => context.ProblemDetails.Extensions.TryAdd("requestId", context.HttpContext.TraceIdentifier);
+    });
 
-//builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => { 
+    builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
-//})
-//.AddDefaultTokenProviders();
+    builder.Services.AddHealthChecks();
 
-builder.Services.AddDataProtection();
-builder.Services.AddDbContext<AppUsersDbContext>(options => 
-    options.UseNpgsql(identityConnectionString, options => { options.SetPostgresVersion(18,0); }));
+    // Add services to the container.
+    // Register NpgsqlDataSource as a singleton(DI will dispose at shutdown)
+    builder.Services.AddSingleton(_ => NpgsqlDataSource.Create(connectionString));
 
-//builder.Services.AddIdentityCore<IdentityUser>(options => { })
-//    .AddUserStore<UserDataAccess>()
-//    .AddDefaultTokenProviders();
+    // Register data + service layers
+    builder.Services.AddScoped<IPoseDataAccess, PoseDataAccess>();
+    builder.Services.AddScoped<IPoseWebService, PoseWebService>();
+    builder.Services.AddScoped<ISequenceDataAccess, SequenceDataAccess>();
+    builder.Services.AddScoped<ISequenceService, SequenceService>();
+    builder.Services.AddScoped<ISessionService, SessionService>();
+    builder.Services.AddScoped<ISessionDataAccess, SessionDataAccess>();
+
+    builder.Services.AddDataProtection();
+    builder.Services.AddDbContext<AppUsersDbContext>(options =>
+        options.UseNpgsql(identityConnectionString, options => { options.SetPostgresVersion(18, 0); }));
+
+    builder.Services.AddAuthorization();
+    builder.Services.AddIdentityApiEndpoints<AppUserModel>()
+        .AddEntityFrameworkStores<AppUsersDbContext>();
 
 
-// register password hasher
-//builder.Services.AddScoped<IPasswordHasher<IdentityUser>, PasswordHasher<IdentityUser>>();
+    // inject automapper
+    builder.Services.AddAutoMapper(cfg =>
+    {
+        cfg.AddMaps(typeof(Program).Assembly); // Scans the assembly where Program is located
+                                               // Or cfg.AddMaps(typeof(SomeClassInAnotherAssembly).Assembly); to scan a different project
+    });
 
-// register your custom Postgres stores
-//builder.Services.AddScoped<IUserStore<IdentityUser>, UserDataAccess>();
-//builder.Services.AddScoped<IRoleStore<IdentityRole>, RoleDataAccess>();
-builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<AppUserModel>()
-    .AddEntityFrameworkStores<AppUsersDbContext>();
+    builder.Services.AddControllers();
+    // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+    builder.Services.AddOpenApi();
 
-// inject automapper
-//builder.Services.AddAutoMapper(typeof(Program));
-builder.Services.AddAutoMapper(cfg =>
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(name: corsPolicyName,
+            builder =>
+            {
+                builder.WithOrigins("http://localhost:5174", "http://localhost:5173")
+                       .AllowAnyHeader()
+                       .AllowAnyMethod()
+                       .AllowCredentials();
+            });
+    });
+
+    var app = builder.Build();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.MapOpenApi();
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseCors(corsPolicyName);
+
+    app.UseExceptionHandler();
+
+    app.UseAuthentication();
+    app.UseAuthorization();
+
+    app.MapHealthChecks("/health");
+    app.MapControllers();
+    app.MapIdentityApi<AppUserModel>();
+
+    app.Run();
+}
+catch (Exception e)
 {
-    cfg.AddMaps(typeof(Program).Assembly); // Scans the assembly where Program is located
-    // Or cfg.AddMaps(typeof(SomeClassInAnotherAssembly).Assembly); to scan a different project
-});
-
-builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-builder.Services.AddCors(options =>
+    Log.Fatal(e, "An error occurred while starting the application.");
+}
+finally
 {
-    options.AddPolicy(name: corsPolicyName,
-        builder =>
-        {
-            builder.WithOrigins("http://localhost:5174", "http://localhost:5173")
-                   .AllowAnyHeader()
-                   .AllowAnyMethod()
-                   .AllowCredentials();
-        });
-});
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
+    Log.CloseAndFlush();
 }
 
-app.UseHttpsRedirection();
-
-app.UseCors(corsPolicyName);
-
-app.UseExceptionHandler();
-
-app.UseAuthentication();
-app.UseAuthorization();
-
-app.MapControllers();
-app.MapIdentityApi<AppUserModel>();
-
-app.Run();

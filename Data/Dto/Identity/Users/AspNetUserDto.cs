@@ -1,4 +1,4 @@
-﻿namespace PoseDatabaseWebApi.Data.Dto.Identity.User
+﻿namespace PoseDatabaseWebApi.Data.Dto.Identity.Users
 {
     public class AspNetUserDto
     {

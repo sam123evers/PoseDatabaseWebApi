@@ -45,7 +45,7 @@ namespace PoseDatabaseWebApi.Controllers
 
         [HttpGet]
         [Route("GetAllSessions")]
-        //[Authorize]
+        [Authorize]
         public async Task<List<SessionModel>> GetAllSessionsAsync()
         {
             //var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -54,7 +54,7 @@ namespace PoseDatabaseWebApi.Controllers
 
         [HttpDelete]
         [Route("RemoveSequence/{seqId}")]
-        //[Authorize]
+        [Authorize]
         public async Task<bool> RemoveSequenceFromSessionAsync([FromRoute] int seqId)
         {
             // optionally check authorization: ensure current user owns the session if necessary

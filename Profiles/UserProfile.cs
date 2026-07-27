@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using PoseDatabaseWebApi.Data.Dto.Identity.User;
+using PoseDatabaseWebApi.Data.Dto.Identity.Users;
 using PoseDatabaseWebApi.Models.Identity;
 
 namespace PoseDatabaseWebApi.Profiles

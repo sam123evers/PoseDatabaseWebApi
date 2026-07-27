@@ -29,3 +29,4 @@ Database:
 - should you just add a difficulty column to pose table?
 
 https://www.daniwinksflexibility.com/flexopedia/hip-flexor-stretches
+
